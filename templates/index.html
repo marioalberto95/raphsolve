@@ -1165,6 +1165,28 @@
             }
         }
 
+
+
+        /* Validaciones dinámicas del sistema */
+        .campo-sistema-dinamico
+        .mensaje-validacion-neon {
+            margin-top: 9px;
+        }
+
+        .campo-sistema-dinamico.campo-con-error {
+            border-color:
+                rgba(255, 43, 214, 0.72) !important;
+            box-shadow:
+                0 0 17px
+                rgba(255, 43, 214, 0.2);
+        }
+
+        .mensaje-validacion-neon
+        .ejemplo-validacion {
+            color: #ffffff;
+            font-weight: 850;
+        }
+
     </style>
 
 </head>
@@ -3282,6 +3304,444 @@
                  */
                 campoFuncion.required =
                     esModoUnaVariable();
+            }
+        );
+    </script>
+
+
+    <script>
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+                const formulario =
+                    document.getElementById(
+                        "formulario-newton"
+                    );
+
+                const modoSistema =
+                    document.getElementById(
+                        "modo-sistema"
+                    );
+
+                if (
+                    !formulario
+                    || !modoSistema
+                ) {
+                    return;
+                }
+
+                let enfoqueProgramado = false;
+
+                function esCampoSistema(
+                    campo
+                ) {
+                    return [
+                        "cantidad_variables",
+                        "variables_sistema",
+                        "funciones_sistema",
+                        "valores_iniciales_sistema"
+                    ].includes(
+                        campo?.name
+                    );
+                }
+
+                function obtenerIndiceCampo(
+                    campo
+                ) {
+                    const campos = [
+                        ...formulario.querySelectorAll(
+                            `[name="${campo.name}"]`
+                        )
+                    ];
+
+                    return Math.max(
+                        0,
+                        campos.indexOf(campo)
+                    );
+                }
+
+                function obtenerDatosMensaje(
+                    campo
+                ) {
+                    const indice =
+                        obtenerIndiceCampo(
+                            campo
+                        );
+
+                    if (
+                        campo.name ===
+                        "funciones_sistema"
+                    ) {
+                        return {
+                            titulo:
+                                `Falta ingresar la ecuación ${indice + 1}`,
+                            texto:
+                                indice === 0
+                                    ? "Escribe una expresión, por ejemplo:"
+                                    : "Ingresa la ecuación correspondiente, por ejemplo:",
+                            ejemplo:
+                                indice === 0
+                                    ? "x^2 + y^2 - 4"
+                                    : "x - y"
+                        };
+                    }
+
+                    if (
+                        campo.name ===
+                        "valores_iniciales_sistema"
+                    ) {
+                        const etiqueta =
+                            campo
+                                .closest(
+                                    ".campo-sistema-dinamico"
+                                )
+                                ?.querySelector(
+                                    ".etiqueta-campo-sistema"
+                                )
+                                ?.textContent
+                                ?.trim()
+                            || `variable ${indice + 1}`;
+
+                        return {
+                            titulo:
+                                "Falta un valor inicial",
+                            texto:
+                                `Escribe el valor inicial de ${etiqueta}.`,
+                            ejemplo:
+                                indice === 0
+                                    ? "1.5"
+                                    : "1"
+                        };
+                    }
+
+                    if (
+                        campo.name ===
+                        "variables_sistema"
+                    ) {
+                        const mensajePersonalizado =
+                            campo.validity.customError
+                                ? campo.validationMessage
+                                : "";
+
+                        return {
+                            titulo:
+                                "Revisa las variables del sistema",
+                            texto:
+                                mensajePersonalizado
+                                || "Escribe una variable por cada ecuación y sepáralas con comas.",
+                            ejemplo:
+                                "x, y"
+                        };
+                    }
+
+                    if (
+                        campo.name ===
+                        "cantidad_variables"
+                    ) {
+                        return {
+                            titulo:
+                                "Número de variables no válido",
+                            texto:
+                                "Selecciona una cantidad entre 2 y 8 variables.",
+                            ejemplo:
+                                "2"
+                        };
+                    }
+
+                    return {
+                        titulo:
+                            "Campo obligatorio",
+                        texto:
+                            "Completa este campo antes de continuar.",
+                        ejemplo:
+                            ""
+                    };
+                }
+
+                function obtenerMensajeCampo(
+                    campo
+                ) {
+                    const grupo =
+                        campo.closest(
+                            ".campo-sistema-dinamico"
+                        )
+                        || campo.parentElement;
+
+                    if (!grupo) {
+                        return null;
+                    }
+
+                    let mensaje =
+                        grupo.querySelector(
+                            ":scope > .mensaje-validacion-sistema"
+                        );
+
+                    if (!mensaje) {
+                        mensaje =
+                            document.createElement(
+                                "div"
+                            );
+
+                        mensaje.className =
+                            "mensaje-validacion-neon "
+                            + "mensaje-validacion-sistema";
+
+                        mensaje.setAttribute(
+                            "role",
+                            "alert"
+                        );
+
+                        mensaje.setAttribute(
+                            "aria-live",
+                            "polite"
+                        );
+
+                        grupo.appendChild(
+                            mensaje
+                        );
+                    }
+
+                    return mensaje;
+                }
+
+                function mostrarErrorSistema(
+                    campo
+                ) {
+                    const datos =
+                        obtenerDatosMensaje(
+                            campo
+                        );
+
+                    const mensaje =
+                        obtenerMensajeCampo(
+                            campo
+                        );
+
+                    if (!mensaje) {
+                        return;
+                    }
+
+                    mensaje.innerHTML = `
+                        <span
+                            class="icono-validacion-neon"
+                            aria-hidden="true"
+                        >
+                            !
+                        </span>
+
+                        <span class="contenido-validacion-neon">
+                            <strong class="titulo-validacion-neon">
+                                ${datos.titulo}
+                            </strong>
+
+                            <span class="texto-validacion-neon">
+                                ${datos.texto}
+
+                                ${
+                                    datos.ejemplo
+                                        ? `
+                                            <span class="ejemplo-validacion">
+                                                ${datos.ejemplo}
+                                            </span>
+                                        `
+                                        : ""
+                                }
+                            </span>
+                        </span>
+                    `;
+
+                    mensaje.classList.add(
+                        "visible"
+                    );
+
+                    campo.classList.add(
+                        "campo-invalido-neon"
+                    );
+
+                    campo.setAttribute(
+                        "aria-invalid",
+                        "true"
+                    );
+
+                    campo
+                        .closest(
+                            ".campo-sistema-dinamico"
+                        )
+                        ?.classList.add(
+                            "campo-con-error"
+                        );
+
+                    if (!enfoqueProgramado) {
+                        enfoqueProgramado = true;
+
+                        mensaje.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center"
+                        });
+
+                        window.setTimeout(
+                            () => {
+                                campo.focus({
+                                    preventScroll: true
+                                });
+
+                                enfoqueProgramado =
+                                    false;
+                            },
+                            280
+                        );
+                    }
+                }
+
+                function ocultarErrorSistema(
+                    campo
+                ) {
+                    campo.classList.remove(
+                        "campo-invalido-neon"
+                    );
+
+                    campo.setAttribute(
+                        "aria-invalid",
+                        "false"
+                    );
+
+                    const grupo =
+                        campo.closest(
+                            ".campo-sistema-dinamico"
+                        )
+                        || campo.parentElement;
+
+                    grupo
+                        ?.classList.remove(
+                            "campo-con-error"
+                        );
+
+                    grupo
+                        ?.querySelector(
+                            ":scope > .mensaje-validacion-sistema"
+                        )
+                        ?.classList.remove(
+                            "visible"
+                        );
+                }
+
+                /*
+                 * El evento invalid no se propaga normalmente;
+                 * se captura en el formulario para incluir también
+                 * los campos creados dinámicamente.
+                 */
+                formulario.addEventListener(
+                    "invalid",
+                    evento => {
+                        const campo =
+                            evento.target;
+
+                        if (
+                            !modoSistema.checked
+                            || !esCampoSistema(
+                                campo
+                            )
+                        ) {
+                            return;
+                        }
+
+                        evento.preventDefault();
+
+                        mostrarErrorSistema(
+                            campo
+                        );
+                    },
+                    true
+                );
+
+                formulario.addEventListener(
+                    "input",
+                    evento => {
+                        const campo =
+                            evento.target;
+
+                        if (
+                            !esCampoSistema(
+                                campo
+                            )
+                        ) {
+                            return;
+                        }
+
+                        if (
+                            campo.name ===
+                            "variables_sistema"
+                        ) {
+                            campo.setCustomValidity(
+                                ""
+                            );
+                        }
+
+                        if (
+                            campo.value.trim()
+                            && campo.validity.valid
+                        ) {
+                            ocultarErrorSistema(
+                                campo
+                            );
+                        }
+                    }
+                );
+
+                formulario.addEventListener(
+                    "change",
+                    evento => {
+                        const campo =
+                            evento.target;
+
+                        if (
+                            esCampoSistema(
+                                campo
+                            )
+                            && campo.validity.valid
+                        ) {
+                            ocultarErrorSistema(
+                                campo
+                            );
+                        }
+                    }
+                );
+
+                modoSistema.addEventListener(
+                    "change",
+                    () => {
+                        if (!modoSistema.checked) {
+                            formulario
+                                .querySelectorAll(
+                                    ".mensaje-validacion-sistema"
+                                )
+                                .forEach(
+                                    mensaje => {
+                                        mensaje.classList.remove(
+                                            "visible"
+                                        );
+                                    }
+                                );
+
+                            formulario
+                                .querySelectorAll(
+                                    ".campo-invalido-neon"
+                                )
+                                .forEach(
+                                    campo => {
+                                        campo.classList.remove(
+                                            "campo-invalido-neon"
+                                        );
+
+                                        campo.setAttribute(
+                                            "aria-invalid",
+                                            "false"
+                                        );
+                                    }
+                                );
+                        }
+                    }
+                );
             }
         );
     </script>
