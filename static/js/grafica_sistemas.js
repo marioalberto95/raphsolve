@@ -97,6 +97,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let eventosPlotlyInstalados = false;
     let botonRotarPantallaCompleta = null;
     let botonAnimarPantallaCompleta = null;
+    let marcadorUbicacionSistema = null;
+    let botonSalirFlotanteSistema = null;
 
     const trayectoria =
         grafica.trayectoria || {
@@ -1004,6 +1006,29 @@ document.addEventListener("DOMContentLoaded", () => {
                     "boton-salir-grafica-completa",
             });
 
+        botonSalirFlotanteSistema =
+            document.createElement(
+                "button"
+            );
+
+        botonSalirFlotanteSistema.type =
+            "button";
+
+        botonSalirFlotanteSistema.className =
+            "btn boton-salir-flotante-sistema";
+
+        botonSalirFlotanteSistema.textContent =
+            "Salir";
+
+        botonSalirFlotanteSistema.setAttribute(
+            "aria-label",
+            "Salir de pantalla completa"
+        );
+
+        envoltura.appendChild(
+            botonSalirFlotanteSistema
+        );
+
         actualizarBotonRotacion();
 
         return {
@@ -1018,6 +1043,8 @@ document.addEventListener("DOMContentLoaded", () => {
             botonAlejar,
             botonRestaurar,
             botonSalir,
+            botonSalirFlotante:
+                botonSalirFlotanteSistema,
         };
     }
 
@@ -1118,6 +1145,56 @@ document.addEventListener("DOMContentLoaded", () => {
                 opacity: 0.5;
                 cursor: not-allowed;
                 transform: none;
+            }
+
+            .boton-salir-flotante-sistema {
+                display: none;
+                position: fixed;
+                top: max(
+                    8px,
+                    env(safe-area-inset-top)
+                );
+                right: max(
+                    8px,
+                    env(safe-area-inset-right)
+                );
+                z-index: 2147483647;
+                min-width: 48px;
+                min-height: 42px;
+                padding: 7px 11px;
+                align-items: center;
+                justify-content: center;
+                color: #ffffff;
+                font-size: 0.82rem;
+                font-weight: 900;
+                background:
+                    linear-gradient(
+                        90deg,
+                        rgba(176, 38, 255, 0.98),
+                        rgba(255, 43, 214, 0.98)
+                    );
+                border: 1px solid
+                    rgba(255, 255, 255, 0.4);
+                border-radius: 11px;
+                box-shadow:
+                    0 0 18px
+                    rgba(255, 43, 214, 0.5);
+            }
+
+            .envoltura-grafica-sistema-3d:fullscreen
+            .boton-salir-flotante-sistema,
+            .envoltura-grafica-sistema-3d:-webkit-full-screen
+            .boton-salir-flotante-sistema,
+            .envoltura-grafica-sistema-3d.pantalla-completa-simulada
+            .boton-salir-flotante-sistema {
+                display: inline-flex;
+            }
+
+            .boton-salir-grafica-completa {
+                order: -1;
+                position: sticky;
+                left: 0;
+                z-index: 4;
             }
 
             .boton-salir-grafica-completa {
@@ -1246,6 +1323,25 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             @media (max-width: 820px) {
+                .boton-salir-flotante-sistema {
+                    top: max(
+                        6px,
+                        env(safe-area-inset-top)
+                    );
+                    right: max(
+                        6px,
+                        env(safe-area-inset-right)
+                    );
+                    min-width: 44px;
+                    min-height: 38px;
+                    padding: 5px 9px;
+                    font-size: 0.75rem;
+                }
+
+                .barra-grafica-sistema-completa {
+                    padding-right: 58px !important;
+                }
+
                 .envoltura-grafica-sistema-3d:fullscreen,
                 .envoltura-grafica-sistema-3d:-webkit-full-screen,
                 .envoltura-grafica-sistema-3d.pantalla-completa-simulada {
@@ -1410,6 +1506,52 @@ document.addEventListener("DOMContentLoaded", () => {
             botonAnimar.disabled;
     }
 
+    function moverGraficaSistemaAlBody(
+        envoltura
+    ) {
+        if (
+            marcadorUbicacionSistema
+            || envoltura.parentNode
+                === document.body
+        ) {
+            return;
+        }
+
+        marcadorUbicacionSistema =
+            document.createComment(
+                "ubicacion-grafica-sistema-3d"
+            );
+
+        envoltura.parentNode.insertBefore(
+            marcadorUbicacionSistema,
+            envoltura
+        );
+
+        document.body.appendChild(
+            envoltura
+        );
+    }
+
+    function restaurarUbicacionGraficaSistema(
+        envoltura
+    ) {
+        if (
+            !marcadorUbicacionSistema
+            || !marcadorUbicacionSistema.parentNode
+        ) {
+            marcadorUbicacionSistema = null;
+            return;
+        }
+
+        marcadorUbicacionSistema.parentNode.insertBefore(
+            envoltura,
+            marcadorUbicacionSistema
+        );
+
+        marcadorUbicacionSistema.remove();
+        marcadorUbicacionSistema = null;
+    }
+
     function elementoEnPantallaCompleta(
         envoltura
     ) {
@@ -1436,6 +1578,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 contenedor3D
             );
         }, 280);
+
+        window.setTimeout(() => {
+            Plotly.Plots.resize(
+                contenedor3D
+            );
+        }, 620);
     }
 
     function actualizarBotonesPantallaCompleta(
@@ -1487,6 +1635,10 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 pantallaCompletaSimulada = true;
 
+                moverGraficaSistemaAlBody(
+                    controlesPantalla.envoltura
+                );
+
                 controlesPantalla.envoltura
                     .classList.add(
                         "pantalla-completa-simulada"
@@ -1494,6 +1646,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         } catch (error) {
             pantallaCompletaSimulada = true;
+
+            moverGraficaSistemaAlBody(
+                controlesPantalla.envoltura
+            );
 
             controlesPantalla.envoltura
                 .classList.add(
@@ -1532,6 +1688,10 @@ document.addEventListener("DOMContentLoaded", () => {
             .classList.remove(
                 "pantalla-completa-simulada"
             );
+
+        restaurarUbicacionGraficaSistema(
+            controlesPantalla.envoltura
+        );
 
         actualizarBotonesPantallaCompleta(
             controlesPantalla
@@ -1712,6 +1872,16 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
         controlesPantalla.botonSalir
+            .addEventListener(
+                "click",
+                () => {
+                    cerrarPantallaCompleta(
+                        controlesPantalla
+                    );
+                }
+            );
+
+        controlesPantalla.botonSalirFlotante
             .addEventListener(
                 "click",
                 () => {

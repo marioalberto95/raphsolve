@@ -926,6 +926,96 @@
             }
         }
 
+
+
+        /*
+         * Botón flotante de salida para navegadores móviles
+         * que no soportan la API Fullscreen en elementos HTML.
+         */
+        .boton-salir-flotante-reproductor {
+            display: none;
+            position: fixed;
+            top: max(
+                8px,
+                env(safe-area-inset-top)
+            );
+            right: max(
+                8px,
+                env(safe-area-inset-right)
+            );
+            z-index: 2147483647;
+            min-width: 46px;
+            min-height: 42px;
+            padding: 7px 11px;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 0.82rem;
+            font-weight: 900;
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(176, 38, 255, 0.98),
+                    rgba(255, 43, 214, 0.98)
+                );
+            border: 1px solid
+                rgba(255, 255, 255, 0.38);
+            border-radius: 11px;
+            box-shadow:
+                0 0 18px
+                rgba(255, 43, 214, 0.5);
+        }
+
+        .reproductor-pasos:fullscreen
+        .boton-salir-flotante-reproductor,
+        .reproductor-pasos:-webkit-full-screen
+        .boton-salir-flotante-reproductor,
+        .reproductor-pasos.modo-pantalla-completa
+        .boton-salir-flotante-reproductor {
+            display: inline-flex;
+        }
+
+        body.reproductor-pantalla-completa {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            overflow: hidden;
+            overscroll-behavior: none;
+        }
+
+        @media (max-width: 767.98px) {
+            .boton-salir-flotante-reproductor {
+                top: max(
+                    6px,
+                    env(safe-area-inset-top)
+                );
+                right: max(
+                    6px,
+                    env(safe-area-inset-right)
+                );
+                min-width: 42px;
+                min-height: 38px;
+                padding: 5px 9px;
+                font-size: 0.75rem;
+            }
+
+            /*
+             * Dejamos espacio en el encabezado para que el botón
+             * flotante no tape el contador ni el título.
+             */
+            html body
+            .reproductor-pasos:fullscreen
+            .cabecera-reproductor-pasos,
+            html body
+            .reproductor-pasos:-webkit-full-screen
+            .cabecera-reproductor-pasos,
+            html body
+            .reproductor-pasos.modo-pantalla-completa
+            .cabecera-reproductor-pasos {
+                padding-right: 48px;
+            }
+        }
+
     </style>
 
 </head>
@@ -2314,7 +2404,9 @@
                         botonReproducir:
                             document.getElementById(
                                 configuracion.botonReproducir
-                            )
+                            ),
+                        marcadorUbicacion: null,
+                        botonSalirFlotante: null
                     }))
                     .filter(elemento =>
                         elemento.contenedor
@@ -2412,6 +2504,62 @@
                     }
                 }
 
+                function moverReproductorAlBody(
+                    elemento
+                ) {
+                    if (
+                        elemento.marcadorUbicacion
+                        || elemento.contenedor.parentNode
+                            === document.body
+                    ) {
+                        return;
+                    }
+
+                    const marcador =
+                        document.createComment(
+                            `ubicacion-${elemento.configuracion.contenedor}`
+                        );
+
+                    elemento.contenedor.parentNode
+                        .insertBefore(
+                            marcador,
+                            elemento.contenedor
+                        );
+
+                    elemento.marcadorUbicacion =
+                        marcador;
+
+                    document.body.appendChild(
+                        elemento.contenedor
+                    );
+                }
+
+                function restaurarUbicacionReproductor(
+                    elemento
+                ) {
+                    const marcador =
+                        elemento.marcadorUbicacion;
+
+                    if (
+                        !marcador
+                        || !marcador.parentNode
+                    ) {
+                        elemento.marcadorUbicacion =
+                            null;
+                        return;
+                    }
+
+                    marcador.parentNode.insertBefore(
+                        elemento.contenedor,
+                        marcador
+                    );
+
+                    marcador.remove();
+
+                    elemento.marcadorUbicacion =
+                        null;
+                }
+
                 function activarModoSimulado(
                     elemento
                 ) {
@@ -2420,8 +2568,16 @@
                             otro.contenedor.classList.remove(
                                 "modo-pantalla-completa"
                             );
+
+                            restaurarUbicacionReproductor(
+                                otro
+                            );
                         }
                     });
+
+                    moverReproductorAlBody(
+                        elemento
+                    );
 
                     elemento.contenedor.classList.add(
                         "modo-pantalla-completa"
@@ -2438,6 +2594,10 @@
                     elementos.forEach(elemento => {
                         elemento.contenedor.classList.remove(
                             "modo-pantalla-completa"
+                        );
+
+                        restaurarUbicacionReproductor(
+                            elemento
                         );
                     });
 
@@ -2528,6 +2688,41 @@
                 }
 
                 elementos.forEach(elemento => {
+                    const botonSalirFlotante =
+                        document.createElement(
+                            "button"
+                        );
+
+                    botonSalirFlotante.type =
+                        "button";
+
+                    botonSalirFlotante.className =
+                        "btn boton-salir-flotante-reproductor";
+
+                    botonSalirFlotante.textContent =
+                        "Salir";
+
+                    botonSalirFlotante.setAttribute(
+                        "aria-label",
+                        "Salir de pantalla completa"
+                    );
+
+                    botonSalirFlotante.addEventListener(
+                        "click",
+                        () => {
+                            cerrarPantallaCompleta(
+                                elemento
+                            );
+                        }
+                    );
+
+                    elemento.botonSalirFlotante =
+                        botonSalirFlotante;
+
+                    elemento.contenedor.appendChild(
+                        botonSalirFlotante
+                    );
+
                     /*
                      * Evita que pasos.js mueva toda la página.
                      * Cuando solicite llevar el paso a la vista,

@@ -109,6 +109,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let botonAnimarCompleto = null;
     let envoltura3D = null;
     let barraCompleta = null;
+    let marcadorUbicacion3D = null;
+    let botonSalirFlotante3D = null;
 
     function obtenerRangoX() {
         if (
@@ -980,6 +982,56 @@ document.addEventListener("DOMContentLoaded", () => {
                 transform: none;
             }
 
+            .boton-salir-flotante-newton {
+                display: none;
+                position: fixed;
+                top: max(
+                    8px,
+                    env(safe-area-inset-top)
+                );
+                right: max(
+                    8px,
+                    env(safe-area-inset-right)
+                );
+                z-index: 2147483647;
+                min-width: 48px;
+                min-height: 42px;
+                padding: 7px 11px;
+                align-items: center;
+                justify-content: center;
+                color: #ffffff;
+                font-size: 0.82rem;
+                font-weight: 900;
+                background:
+                    linear-gradient(
+                        90deg,
+                        rgba(176, 38, 255, 0.98),
+                        rgba(255, 43, 214, 0.98)
+                    );
+                border: 1px solid
+                    rgba(255, 255, 255, 0.4);
+                border-radius: 11px;
+                box-shadow:
+                    0 0 18px
+                    rgba(255, 43, 214, 0.5);
+            }
+
+            .envoltura-grafica-newton-3d:fullscreen
+            .boton-salir-flotante-newton,
+            .envoltura-grafica-newton-3d:-webkit-full-screen
+            .boton-salir-flotante-newton,
+            .envoltura-grafica-newton-3d.pantalla-completa-simulada
+            .boton-salir-flotante-newton {
+                display: inline-flex;
+            }
+
+            .boton-salir-newton-completo {
+                order: -1;
+                position: sticky;
+                left: 0;
+                z-index: 4;
+            }
+
             .boton-salir-newton-completo {
                 color: #ffffff;
                 background:
@@ -1096,6 +1148,25 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             @media (max-width: 820px) {
+                .boton-salir-flotante-newton {
+                    top: max(
+                        6px,
+                        env(safe-area-inset-top)
+                    );
+                    right: max(
+                        6px,
+                        env(safe-area-inset-right)
+                    );
+                    min-width: 44px;
+                    min-height: 38px;
+                    padding: 5px 9px;
+                    font-size: 0.75rem;
+                }
+
+                .barra-grafica-newton-completa {
+                    padding-right: 58px !important;
+                }
+
                 .envoltura-grafica-newton-3d:fullscreen,
                 .envoltura-grafica-newton-3d:-webkit-full-screen,
                 .envoltura-grafica-newton-3d.pantalla-completa-simulada {
@@ -1240,6 +1311,29 @@ document.addEventListener("DOMContentLoaded", () => {
                     "boton-salir-newton-completo",
             });
 
+        botonSalirFlotante3D =
+            document.createElement(
+                "button"
+            );
+
+        botonSalirFlotante3D.type =
+            "button";
+
+        botonSalirFlotante3D.className =
+            "btn boton-salir-flotante-newton";
+
+        botonSalirFlotante3D.textContent =
+            "Salir";
+
+        botonSalirFlotante3D.setAttribute(
+            "aria-label",
+            "Salir de pantalla completa"
+        );
+
+        envoltura3D.appendChild(
+            botonSalirFlotante3D
+        );
+
         botonPantallaCompleta =
             document.createElement("button");
 
@@ -1298,6 +1392,11 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         botonSalir.addEventListener(
+            "click",
+            cerrarPantallaCompleta
+        );
+
+        botonSalirFlotante3D.addEventListener(
             "click",
             cerrarPantallaCompleta
         );
@@ -1499,6 +1598,48 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
+    function moverGrafica3DAlBody() {
+        if (
+            marcadorUbicacion3D
+            || envoltura3D.parentNode
+                === document.body
+        ) {
+            return;
+        }
+
+        marcadorUbicacion3D =
+            document.createComment(
+                "ubicacion-grafica-newton-3d"
+            );
+
+        envoltura3D.parentNode.insertBefore(
+            marcadorUbicacion3D,
+            envoltura3D
+        );
+
+        document.body.appendChild(
+            envoltura3D
+        );
+    }
+
+    function restaurarUbicacionGrafica3D() {
+        if (
+            !marcadorUbicacion3D
+            || !marcadorUbicacion3D.parentNode
+        ) {
+            marcadorUbicacion3D = null;
+            return;
+        }
+
+        marcadorUbicacion3D.parentNode.insertBefore(
+            envoltura3D,
+            marcadorUbicacion3D
+        );
+
+        marcadorUbicacion3D.remove();
+        marcadorUbicacion3D = null;
+    }
+
     function elementoEnPantallaCompleta() {
         return (
             document.fullscreenElement ===
@@ -1524,6 +1665,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 Plotly.Plots.resize(grafica3D);
             },
             260
+        );
+
+        window.setTimeout(
+            () => {
+                Plotly.Plots.resize(grafica3D);
+            },
+            620
         );
     }
 
@@ -1576,6 +1724,8 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 pantallaCompletaSimulada = true;
 
+                moverGrafica3DAlBody();
+
                 envoltura3D.classList.add(
                     "pantalla-completa-simulada"
                 );
@@ -1583,6 +1733,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
             pantallaCompletaSimulada = true;
+
+            moverGrafica3DAlBody();
 
             envoltura3D.classList.add(
                 "pantalla-completa-simulada"
@@ -1617,6 +1769,8 @@ document.addEventListener("DOMContentLoaded", () => {
         envoltura3D.classList.remove(
             "pantalla-completa-simulada"
         );
+
+        restaurarUbicacionGrafica3D();
 
         actualizarEstadoPantallaCompleta();
 
