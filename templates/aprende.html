@@ -33,6 +33,64 @@
         defer
         src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
     </script>
+
+    <style>
+        /*
+         * Evita que fórmulas largas se salgan de sus tarjetas,
+         * especialmente en pantallas pequeñas.
+         */
+        .formula-paso,
+        .resultado-final-paso {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-x: contain;
+        }
+
+        .formula-paso mjx-container[display="true"],
+        .resultado-final-paso mjx-container[display="true"] {
+            max-width: 100%;
+            margin-right: auto !important;
+            margin-left: auto !important;
+        }
+
+        @media (max-width: 575.98px) {
+            .seccion-aprende {
+                padding-right: 14px;
+                padding-left: 14px;
+            }
+
+            .formula-paso,
+            .resultado-final-paso {
+                padding-right: 8px;
+                padding-left: 8px;
+            }
+
+            .formula-paso mjx-container,
+            .resultado-final-paso mjx-container {
+                font-size: 92% !important;
+            }
+
+            /*
+             * Las soluciones se muestran verticalmente para que
+             * cada valor permanezca dentro de la tarjeta.
+             */
+            .resultado-final-paso
+            mjx-container[display="true"] {
+                min-width: 0 !important;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .formula-paso mjx-container,
+            .resultado-final-paso mjx-container {
+                font-size: 84% !important;
+            }
+        }
+    </style>
+
 </head>
 
 <body>
@@ -511,9 +569,10 @@
 
             <div class="resultado-final-paso">
                 \[
-                    x\approx1.41421356,
-                    \qquad
-                    y\approx1.41421356
+                    \begin{aligned}
+                        x &\approx 1.41421356, \\
+                        y &\approx 1.41421356
+                    \end{aligned}
                 \]
             </div>
 
@@ -545,11 +604,11 @@
 
             <div class="resultado-final-paso">
                 \[
-                    x=1,
-                    \qquad
-                    y=1,
-                    \qquad
-                    z=1
+                    \begin{aligned}
+                        x &= 1, \\
+                        y &= 1, \\
+                        z &= 1
+                    \end{aligned}
                 \]
             </div>
 
