@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Ejercicios | RaphSolve</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/estilos.css') }}"
+    >
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]]
+            }
+        };
+    </script>
+
+    <script
+        defer
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a
+                class="navbar-brand fw-bold"
+                href="{{ url_for('inicio') }}"
+            >
+                RaphSolve
+            </a>
+
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menuPrincipal"
+                aria-controls="menuPrincipal"
+                aria-expanded="false"
+                aria-label="Mostrar navegación"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div
+                id="menuPrincipal"
+                class="collapse navbar-collapse"
+            >
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('inicio') }}"
+                        >
+                            Resolver
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('aprende') }}"
+                        >
+                            Aprende
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link active"
+                            href="{{ url_for('ejercicios') }}"
+                        >
+                            Ejercicios
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('practica') }}"
+                        >
+                            Práctica
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('historial') }}"
+                        >
+                            Historial
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('calculadora') }}"
+                        >
+                            Calculadora
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        <section class="text-center mb-5">
+            <h1 class="titulo-principal">
+                Ejercicios resueltos
+            </h1>
+
+            <p class="subtitulo">
+                Estudia ejemplos de una variable y sistemas
+                no lineales de varias variables.
+            </p>
+        </section>
+
+        <section class="tarjeta-principal mb-5">
+            <div
+                class="d-flex flex-column flex-lg-row
+                       justify-content-between align-items-lg-center
+                       gap-3"
+            >
+                <div>
+                    <h2 class="h4 mb-1">
+                        Ejercicios de una variable
+                    </h2>
+
+                    <p class="text-secondary mb-0">
+                        Aplicación clásica de Newton-Raphson para
+                        encontrar una raíz de \(f(x)=0\).
+                    </p>
+                </div>
+
+                <span class="insignia-modo">
+                    1D
+                </span>
+            </div>
+        </section>
+
+        {% if ejercicios %}
+            <div class="row g-4 mb-5">
+                {% for ejercicio in ejercicios %}
+                    <div class="col-xl-4 col-md-6">
+                        <article class="tarjeta-ejercicio">
+                            <div
+                                class="d-flex justify-content-between
+                                       align-items-start gap-3"
+                            >
+                                <h2 class="h5">
+                                    {{ ejercicio.titulo }}
+                                </h2>
+
+                                <span
+                                    class="nivel-ejercicio
+                                    nivel-{{ ejercicio.nivel | lower }}"
+                                >
+                                    {{ ejercicio.nivel }}
+                                </span>
+                            </div>
+
+                            <p class="text-secondary">
+                                {{ ejercicio.descripcion }}
+                            </p>
+
+                            <div class="formula-paso">
+                                \[
+                                    f(x)
+                                    =
+                                    {{ ejercicio.funcion_latex }}
+                                \]
+                            </div>
+
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <div class="metrica-sistema">
+                                        <span>
+                                            Valor inicial
+                                        </span>
+
+                                        <strong>
+                                            {{
+                                                ejercicio.valor_inicial
+                                            }}
+                                        </strong>
+                                    </div>
+                                </div>
+
+                                <div class="col-6">
+                                    <div class="metrica-sistema">
+                                        <span>
+                                            Tolerancia
+                                        </span>
+
+                                        <strong>
+                                            {{
+                                                ejercicio.tolerancia
+                                            }}
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button
+                                class="btn boton-principal w-100"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#solucion{{ ejercicio.id }}"
+                                aria-expanded="false"
+                                aria-controls="solucion{{ ejercicio.id }}"
+                            >
+                                Mostrar solución
+                            </button>
+
+                            <div
+                                id="solucion{{ ejercicio.id }}"
+                                class="collapse mt-3"
+                            >
+                                <div class="solucion-ejercicio">
+                                    <p>
+                                        <strong>Derivada:</strong>
+                                    </p>
+
+                                    <div class="formula-paso">
+                                        \[
+                                            f'(x)
+                                            =
+                                            {{
+                                                ejercicio.derivada_latex
+                                            }}
+                                        \]
+                                    </div>
+
+                                    <h3 class="h6 mt-4">
+                                        Procedimiento
+                                    </h3>
+
+                                    <ol class="ps-3">
+                                        {% for paso
+                                           in ejercicio.procedimiento %}
+                                            <li class="mb-2">
+                                                {{ paso }}
+                                            </li>
+                                        {% endfor %}
+                                    </ol>
+
+                                    <div class="resultado-ejercicio">
+                                        Raíz aproximada:
+
+                                        <strong>
+                                            {{ ejercicio.resultado }}
+                                        </strong>
+                                    </div>
+
+                                    <a
+                                        href="{{ url_for(
+                                            'inicio',
+                                            modo='una_variable'
+                                        ) }}"
+                                        class="btn boton-secundario
+                                               w-100 mt-3
+                                               cargar-ejercicio-solucionador"
+                                        data-funcion="{{
+                                            ejercicio.get(
+                                                'funcion',
+                                                ejercicio.get(
+                                                    'funcion_texto',
+                                                    ''
+                                                )
+                                            ) | e
+                                        }}"
+                                        data-funcion-latex="{{
+                                            ejercicio.funcion_latex | e
+                                        }}"
+                                        data-valor-inicial="{{
+                                            ejercicio.valor_inicial
+                                        }}"
+                                        data-tolerancia="{{
+                                            ejercicio.tolerancia
+                                        }}"
+                                        data-max-iteraciones="{{
+                                            ejercicio.get(
+                                                'max_iteraciones',
+                                                100
+                                            )
+                                        }}"
+                                    >
+                                        Probar en el solucionador
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info mb-5">
+                No hay ejercicios de una variable disponibles.
+            </div>
+        {% endif %}
+
+        <section class="tarjeta-principal mb-4">
+            <div
+                class="d-flex flex-column flex-lg-row
+                       justify-content-between align-items-lg-center
+                       gap-3"
+            >
+                <div>
+                    <h2 class="h4 mb-1">
+                        Sistemas de varias variables
+                    </h2>
+
+                    <p class="text-secondary mb-0">
+                        Aplicación avanzada mediante la matriz Jacobiana.
+                    </p>
+                </div>
+
+                <span class="insignia-modo insignia-modo-sistema">
+                    ND
+                </span>
+            </div>
+        </section>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <article class="tarjeta-ejercicio">
+                    <div
+                        class="d-flex justify-content-between
+                               align-items-start gap-3"
+                    >
+                        <h2 class="h5">
+                            Sistema circular de dos variables
+                        </h2>
+
+                        <span
+                            class="nivel-ejercicio nivel-intermedio"
+                        >
+                            Intermedio
+                        </span>
+                    </div>
+
+                    <p class="text-secondary">
+                        Encuentra la intersección entre una circunferencia
+                        y la recta \(x=y\).
+                    </p>
+
+                    <div class="formula-paso">
+                        \[
+                            \begin{cases}
+                                x^2+y^2-4=0 \\
+                                x-y=0
+                            \end{cases}
+                        \]
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <div class="metrica-sistema">
+                                <span>Vector inicial</span>
+
+                                <strong>
+                                    \(X_0=(1.5,1)\)
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="metrica-sistema">
+                                <span>Tolerancia</span>
+
+                                <strong>0.0001</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        class="btn boton-principal w-100"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#solucionSistemaDos"
+                        aria-expanded="false"
+                        aria-controls="solucionSistemaDos"
+                    >
+                        Mostrar solución
+                    </button>
+
+                    <div
+                        id="solucionSistemaDos"
+                        class="collapse mt-3"
+                    >
+                        <div class="solucion-ejercicio">
+                            <h3 class="h6">
+                                Vector de funciones
+                            </h3>
+
+                            <div class="formula-paso">
+                                \[
+                                    F(x,y)
+                                    =
+                                    \begin{bmatrix}
+                                        x^2+y^2-4 \\
+                                        x-y
+                                    \end{bmatrix}
+                                \]
+                            </div>
+
+                            <h3 class="h6">
+                                Matriz Jacobiana
+                            </h3>
+
+                            <div class="formula-paso">
+                                \[
+                                    J(x,y)
+                                    =
+                                    \begin{bmatrix}
+                                        2x & 2y \\
+                                        1 & -1
+                                    \end{bmatrix}
+                                \]
+                            </div>
+
+                            <ol class="ps-3">
+                                <li class="mb-2">
+                                    Se inicia con \(X_0=(1.5,1)\).
+                                </li>
+
+                                <li class="mb-2">
+                                    Se evalúan \(F(X_n)\) y \(J(X_n)\).
+                                </li>
+
+                                <li class="mb-2">
+                                    Se resuelve
+                                    \(J(X_n)\Delta X_n=F(X_n)\).
+                                </li>
+
+                                <li class="mb-2">
+                                    Se calcula
+                                    \(X_{n+1}=X_n-\Delta X_n\).
+                                </li>
+                            </ol>
+
+                            <div class="resultado-ejercicio">
+                                Solución aproximada:
+
+                                <strong>
+                                    \[
+                                        x\approx1.41421356,
+                                        \qquad
+                                        y\approx1.41421356
+                                    \]
+                                </strong>
+                            </div>
+
+                            <a
+                                href="{{ url_for(
+                                    'inicio',
+                                    modo='sistema'
+                                ) }}"
+                                class="btn boton-secundario w-100 mt-3
+                                       cargar-sistema-solucionador"
+                                data-sistema="dos"
+                            >
+                                Probar sistema de dos variables
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <div class="col-lg-6">
+                <article class="tarjeta-ejercicio">
+                    <div
+                        class="d-flex justify-content-between
+                               align-items-start gap-3"
+                    >
+                        <h2 class="h5">
+                            Sistema simétrico de tres variables
+                        </h2>
+
+                        <span
+                            class="nivel-ejercicio nivel-avanzado"
+                        >
+                            Avanzado
+                        </span>
+                    </div>
+
+                    <p class="text-secondary">
+                        Resuelve un sistema no lineal cuya solución
+                        simétrica es \((1,1,1)\).
+                    </p>
+
+                    <div class="formula-paso">
+                        \[
+                            \begin{cases}
+                                x^2+y+z-3=0 \\
+                                x+y^2+z-3=0 \\
+                                x+y+z^2-3=0
+                            \end{cases}
+                        \]
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <div class="metrica-sistema">
+                                <span>Vector inicial</span>
+
+                                <strong>
+                                    \(X_0=(0.8,1.2,1.1)\)
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="metrica-sistema">
+                                <span>Tolerancia</span>
+
+                                <strong>0.0001</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        class="btn boton-principal w-100"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#solucionSistemaTres"
+                        aria-expanded="false"
+                        aria-controls="solucionSistemaTres"
+                    >
+                        Mostrar solución
+                    </button>
+
+                    <div
+                        id="solucionSistemaTres"
+                        class="collapse mt-3"
+                    >
+                        <div class="solucion-ejercicio">
+                            <h3 class="h6">
+                                Matriz Jacobiana
+                            </h3>
+
+                            <div class="formula-paso">
+                                \[
+                                    J(x,y,z)
+                                    =
+                                    \begin{bmatrix}
+                                        2x & 1 & 1 \\
+                                        1 & 2y & 1 \\
+                                        1 & 1 & 2z
+                                    \end{bmatrix}
+                                \]
+                            </div>
+
+                            <ol class="ps-3">
+                                <li class="mb-2">
+                                    Se inicia con
+                                    \(X_0=(0.8,1.2,1.1)\).
+                                </li>
+
+                                <li class="mb-2">
+                                    Se construye la Jacobiana numérica.
+                                </li>
+
+                                <li class="mb-2">
+                                    Se obtiene la corrección
+                                    \(\Delta X_n\).
+                                </li>
+
+                                <li class="mb-2">
+                                    Se repite hasta reducir el error
+                                    y el residuo.
+                                </li>
+                            </ol>
+
+                            <div class="resultado-ejercicio">
+                                Solución aproximada:
+
+                                <strong>
+                                    \[
+                                        x\approx1,
+                                        \qquad
+                                        y\approx1,
+                                        \qquad
+                                        z\approx1
+                                    \]
+                                </strong>
+                            </div>
+
+                            <a
+                                href="{{ url_for(
+                                    'inicio',
+                                    modo='sistema'
+                                ) }}"
+                                class="btn boton-secundario w-100 mt-3
+                                       cargar-sistema-solucionador"
+                                data-sistema="tres"
+                            >
+                                Probar sistema de tres variables
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <section class="tarjeta-resultado text-center mt-5">
+            <h2 class="h4">
+                Practica con tus propias ecuaciones
+            </h2>
+
+            <p>
+                Utiliza el solucionador para observar la tabla,
+                el procedimiento paso a paso y las gráficas.
+            </p>
+
+            <a
+                href="{{ url_for('inicio') }}"
+                class="btn boton-principal px-5"
+            >
+                Ir al solucionador
+            </a>
+        </section>
+    </main>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const URL_SOLUCIONADOR = "/";
+            const CLAVE_SISTEMA_PENDIENTE =
+                "raphsolve_sistema_pendiente";
+
+            function convertirLatexBasico(latex) {
+                let expresion = String(
+                    latex || ""
+                ).trim();
+
+                expresion = expresion
+                    .replaceAll("\\left", "")
+                    .replaceAll("\\right", "")
+                    .replaceAll("\\cdot", "*")
+                    .replaceAll("\\times", "*")
+                    .replaceAll("\\pi", "pi")
+                    .replaceAll(
+                        "\\operatorname{sen}",
+                        "sin"
+                    )
+                    .replaceAll(
+                        "\\operatorname{sin}",
+                        "sin"
+                    )
+                    .replaceAll(
+                        "\\operatorname{cos}",
+                        "cos"
+                    )
+                    .replaceAll(
+                        "\\operatorname{tan}",
+                        "tan"
+                    )
+                    .replaceAll("\\ln", "log");
+
+                let anterior = "";
+
+                while (
+                    anterior !== expresion
+                    && expresion.includes("\\frac")
+                ) {
+                    anterior = expresion;
+
+                    expresion = expresion.replace(
+                        /\\frac\{([^{}]+)\}\{([^{}]+)\}/g,
+                        "(($1)/($2))"
+                    );
+                }
+
+                while (
+                    expresion.includes("\\sqrt")
+                ) {
+                    const nueva = expresion.replace(
+                        /\\sqrt\{([^{}]+)\}/g,
+                        "sqrt($1)"
+                    );
+
+                    if (nueva === expresion) {
+                        break;
+                    }
+
+                    expresion = nueva;
+                }
+
+                expresion = expresion
+                    .replace(
+                        /\^\{([^{}]+)\}/g,
+                        "^($1)"
+                    )
+                    .replace(
+                        /\{([^{}]+)\}/g,
+                        "($1)"
+                    )
+                    .replaceAll("\\", "")
+                    .replace(/\s+/g, " ")
+                    .trim();
+
+                return expresion;
+            }
+
+            function abrirEjercicioUnaVariable(
+                boton
+            ) {
+                const funcionDirecta =
+                    String(
+                        boton.dataset.funcion || ""
+                    ).trim();
+
+                const funcion =
+                    funcionDirecta
+                    || convertirLatexBasico(
+                        boton.dataset.funcionLatex
+                    );
+
+                if (!funcion) {
+                    window.alert(
+                        "No fue posible recuperar "
+                        + "la función del ejercicio."
+                    );
+
+                    return;
+                }
+
+                const parametros =
+                    new URLSearchParams({
+                        modo: "una_variable",
+                        funcion,
+                        valor_inicial:
+                            boton.dataset.valorInicial
+                            || "1.5",
+                        tolerancia:
+                            boton.dataset.tolerancia
+                            || "0.0001",
+                        max_iteraciones:
+                            boton.dataset.maxIteraciones
+                            || "100"
+                    });
+
+                window.location.assign(
+                    `${URL_SOLUCIONADOR}?`
+                    + parametros.toString()
+                    + "#formulario-newton"
+                );
+            }
+
+            const sistemas = {
+                dos: {
+                    cantidad: 2,
+                    variables: "x, y",
+                    ecuaciones: [
+                        "x^2 + y^2 - 4",
+                        "x - y"
+                    ],
+                    valores: [
+                        "1.5",
+                        "1"
+                    ],
+                    tolerancia: "0.0001",
+                    max_iteraciones: "100"
+                },
+
+                tres: {
+                    cantidad: 3,
+                    variables: "x, y, z",
+                    ecuaciones: [
+                        "x^2 + y + z - 3",
+                        "x + y^2 + z - 3",
+                        "x + y + z^2 - 3"
+                    ],
+                    valores: [
+                        "0.8",
+                        "1.2",
+                        "1.1"
+                    ],
+                    tolerancia: "0.0001",
+                    max_iteraciones: "100"
+                }
+            };
+
+            function abrirSistema(
+                nombreSistema
+            ) {
+                const sistema =
+                    sistemas[nombreSistema];
+
+                if (!sistema) {
+                    return;
+                }
+
+                try {
+                    sessionStorage.setItem(
+                        CLAVE_SISTEMA_PENDIENTE,
+                        JSON.stringify(sistema)
+                    );
+                } catch (error) {
+                    console.warn(
+                        "No fue posible preparar "
+                        + "el sistema.",
+                        error
+                    );
+                }
+
+                window.location.assign(
+                    `${URL_SOLUCIONADOR}`
+                    + "?modo=sistema"
+                    + "#formulario-newton"
+                );
+            }
+
+            document
+                .querySelectorAll(
+                    ".cargar-ejercicio-solucionador"
+                )
+                .forEach(boton => {
+                    boton.addEventListener(
+                        "click",
+                        evento => {
+                            evento.preventDefault();
+
+                            abrirEjercicioUnaVariable(
+                                boton
+                            );
+                        }
+                    );
+                });
+
+            document
+                .querySelectorAll(
+                    ".cargar-sistema-solucionador"
+                )
+                .forEach(boton => {
+                    boton.addEventListener(
+                        "click",
+                        evento => {
+                            evento.preventDefault();
+
+                            abrirSistema(
+                                boton.dataset.sistema
+                            );
+                        }
+                    );
+                });
+        });
+    </script>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <script
+        src="{{ url_for('static', filename='js/fondo-neon.js') }}">
+    </script>
+</body>
+</html>

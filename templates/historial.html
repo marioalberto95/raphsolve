@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Historial | RaphSolve</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/estilos.css') }}"
+    >
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a
+                class="navbar-brand fw-bold"
+                href="{{ url_for('inicio') }}"
+            >
+                RaphSolve
+            </a>
+
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menuPrincipal"
+                aria-controls="menuPrincipal"
+                aria-expanded="false"
+                aria-label="Mostrar navegación"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div
+                id="menuPrincipal"
+                class="collapse navbar-collapse"
+            >
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('inicio') }}"
+                        >
+                            Resolver
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('aprende') }}"
+                        >
+                            Aprende
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('ejercicios') }}"
+                        >
+                            Ejercicios
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('practica') }}"
+                        >
+                            Práctica
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link active"
+                            href="{{ url_for('historial') }}"
+                        >
+                            Historial
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('calculadora') }}"
+                        >
+                            Calculadora
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        <section class="text-center mb-5">
+            <h1 class="titulo-principal">
+                Historial de cálculos
+            </h1>
+
+            <p class="subtitulo">
+                Consulta y vuelve a resolver funciones y sistemas
+                guardados anteriormente.
+            </p>
+        </section>
+
+        <section class="row g-3 mb-4">
+            <div class="col-md-4">
+                <article class="resumen-historial">
+                    <span>Total de cálculos</span>
+
+                    <strong id="contador-historial-total">
+                        0
+                    </strong>
+                </article>
+            </div>
+
+            <div class="col-md-4">
+                <article class="resumen-historial">
+                    <span>Una variable</span>
+
+                    <strong id="contador-historial-una-variable">
+                        0
+                    </strong>
+                </article>
+            </div>
+
+            <div class="col-md-4">
+                <article class="resumen-historial">
+                    <span>Sistemas</span>
+
+                    <strong id="contador-historial-sistemas">
+                        0
+                    </strong>
+                </article>
+            </div>
+        </section>
+
+        <section class="tarjeta-principal">
+            <div
+                class="d-flex flex-column flex-xl-row
+                       justify-content-between align-items-xl-center
+                       gap-3 mb-4"
+            >
+                <div>
+                    <h2 class="h4 mb-1">
+                        Operaciones guardadas
+                    </h2>
+
+                    <p class="text-secondary mb-0">
+                        Pulsa una tarjeta para cargar nuevamente
+                        sus valores en el solucionador.
+                    </p>
+                </div>
+
+                <button
+                    id="limpiar-historial"
+                    type="button"
+                    class="btn btn-outline-danger"
+                >
+                    Limpiar historial
+                </button>
+            </div>
+
+            <div class="row g-3 align-items-end mb-4">
+                <div class="col-lg-6">
+                    <label
+                        for="buscar-historial"
+                        class="form-label"
+                    >
+                        Buscar
+                    </label>
+
+                    <input
+                        id="buscar-historial"
+                        type="search"
+                        class="form-control"
+                        placeholder="Función, ecuación o variable"
+                        autocomplete="off"
+                    >
+                </div>
+
+                <div class="col-lg-6">
+                    <span class="form-label d-block">
+                        Mostrar
+                    </span>
+
+                    <div
+                        class="filtros-historial"
+                        role="group"
+                        aria-label="Filtrar historial"
+                    >
+                        <button
+                            type="button"
+                            class="btn boton-filtro-historial activo"
+                            data-filtro="todos"
+                        >
+                            Todos
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn boton-filtro-historial"
+                            data-filtro="una_variable"
+                        >
+                            Una variable
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn boton-filtro-historial"
+                            data-filtro="sistema"
+                        >
+                            Sistemas
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="lista-historial"></div>
+
+            <div
+                id="historial-sin-resultados"
+                class="text-center py-5 d-none"
+            >
+                <h3 class="h5">
+                    No hay cálculos que coincidan
+                </h3>
+
+                <p class="text-secondary mb-0">
+                    Cambia el filtro o escribe otra búsqueda.
+                </p>
+            </div>
+
+            <div
+                id="historial-vacio"
+                class="text-center py-5"
+            >
+                <h3 class="h5">
+                    Todavía no hay cálculos guardados
+                </h3>
+
+                <p class="text-secondary">
+                    Resuelve una función o un sistema para
+                    agregarlo al historial.
+                </p>
+
+                <a
+                    href="{{ url_for('inicio') }}"
+                    class="btn boton-principal px-5"
+                >
+                    Resolver ejercicio
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <script
+        src="{{ url_for('static', filename='js/historial.js') }}">
+    </script>
+
+    <script
+        src="{{ url_for('static', filename='js/fondo-neon.js') }}">
+    </script>
+</body>
+</html>

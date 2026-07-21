@@ -1,0 +1,56 @@
+[
+    {
+        "id": 1,
+        "titulo": "Raíz cuadrada de 2",
+        "nivel": "Básico",
+        "funcion": "x^2 - 2",
+        "funcion_latex": "x^2-2",
+        "derivada_latex": "2x",
+        "valor_inicial": 1.5,
+        "tolerancia": 0.0001,
+        "resultado": 1.414214,
+        "descripcion": "Encontrar una aproximación de la raíz cuadrada de 2.",
+        "procedimiento": [
+            "Se calcula la derivada de la función.",
+            "Se utiliza el valor inicial x₀ = 1.5.",
+            "Se aplica la fórmula de Newton-Raphson.",
+            "El procedimiento continúa hasta alcanzar la tolerancia."
+        ]
+    },
+    {
+        "id": 2,
+        "titulo": "Ecuación cúbica",
+        "nivel": "Intermedio",
+        "funcion": "x^3 - x - 2",
+        "funcion_latex": "x^3-x-2",
+        "derivada_latex": "3x^2-1",
+        "valor_inicial": 1.5,
+        "tolerancia": 0.0001,
+        "resultado": 1.52138,
+        "descripcion": "Encontrar una raíz aproximada de una función cúbica.",
+        "procedimiento": [
+            "Se deriva la función original.",
+            "Se evalúa la función y su derivada en x₀.",
+            "Se calcula una nueva aproximación.",
+            "Después de tres iteraciones se alcanza la tolerancia."
+        ]
+    },
+    {
+        "id": 3,
+        "titulo": "Función trigonométrica",
+        "nivel": "Avanzado",
+        "funcion": "cos(x) - x",
+        "funcion_latex": "\\cos(x)-x",
+        "derivada_latex": "-\\sin(x)-1",
+        "valor_inicial": 0.5,
+        "tolerancia": 0.0001,
+        "resultado": 0.739085,
+        "descripcion": "Encontrar el punto donde cos(x) es igual a x.",
+        "procedimiento": [
+            "Se obtiene la derivada de la función trigonométrica.",
+            "Se toma x₀ = 0.5 como aproximación inicial.",
+            "Se aplican las iteraciones de Newton-Raphson.",
+            "El resultado converge aproximadamente a 0.739085."
+        ]
+    }
+]

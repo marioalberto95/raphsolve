@@ -1,0 +1,2015 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>RaphSolve</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/estilos.css') }}"
+    >
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]]
+            }
+        };
+    </script>
+
+    <script
+        defer
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+
+    <script
+        src="https://cdn.plot.ly/plotly-3.6.0.min.js"
+        charset="utf-8">
+    </script>
+
+    <style>
+        /*
+         * Reproductor estable para los procedimientos.
+         * Se incluye aquí para que este index.html funcione
+         * sin modificar estilos.css.
+         */
+
+        .reproductor-pasos {
+            display: grid;
+            grid-template-rows:
+                auto
+                auto
+                minmax(0, auto)
+                auto;
+            overflow: hidden;
+            scroll-margin-top: 24px;
+        }
+
+        .cabecera-reproductor-pasos {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            margin-bottom: 16px;
+        }
+
+        .acciones-reproductor-pasos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .boton-pantalla-completa {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 40px;
+            color: var(--texto, #f6f3ff);
+            font-weight: 800;
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(18, 8, 31, 0.96),
+                    rgba(7, 4, 15, 0.96)
+                );
+            border: 1px solid
+                rgba(0, 245, 212, 0.38);
+            border-radius: 10px;
+            transition:
+                transform 180ms ease,
+                border-color 180ms ease,
+                box-shadow 180ms ease;
+        }
+
+        .boton-pantalla-completa:hover,
+        .boton-pantalla-completa:focus-visible {
+            color: var(--texto, #f6f3ff);
+            border-color:
+                var(--rosa, #ff2bd6);
+            transform: translateY(-1px);
+            box-shadow:
+                0 0 14px
+                    rgba(0, 245, 212, 0.25),
+                0 0 22px
+                    rgba(255, 43, 214, 0.16);
+        }
+
+        .icono-pantalla-completa {
+            font-size: 1.15rem;
+            line-height: 1;
+        }
+
+        .visor-reproductor-pasos {
+            height: clamp(
+                390px,
+                54vh,
+                620px
+            );
+            min-height: 390px;
+            padding: clamp(
+                14px,
+                2vw,
+                22px
+            );
+            overflow-y: auto;
+            overflow-x: auto;
+            scrollbar-gutter: stable;
+            overscroll-behavior: contain;
+            overflow-anchor: none;
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(5, 3, 12, 0.94),
+                    rgba(21, 7, 35, 0.9)
+                );
+            border: 1px solid
+                rgba(0, 245, 212, 0.22);
+            border-radius: 15px;
+            box-shadow:
+                inset 0 0 24px
+                    rgba(176, 38, 255, 0.07);
+        }
+
+        .visor-reproductor-pasos
+        > .contenido-paso {
+            min-height: 100%;
+            margin: 0;
+            overflow-anchor: none;
+        }
+
+        .controles-reproductor-pasos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            padding-top: 16px;
+            background:
+                linear-gradient(
+                    to bottom,
+                    rgba(7, 4, 15, 0),
+                    rgba(7, 4, 15, 0.96)
+                        32%
+                );
+        }
+
+        .controles-reproductor-pasos
+        .boton-reproducir-principal {
+            flex: 1 1 210px;
+        }
+
+        .reproductor-pasos:fullscreen,
+        .reproductor-pasos:-webkit-full-screen,
+        .reproductor-pasos.modo-pantalla-completa {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            width: 100vw;
+            max-width: none;
+            height: 100vh;
+            margin: 0 !important;
+            padding: clamp(
+                14px,
+                2.4vw,
+                30px
+            );
+            grid-template-rows:
+                auto
+                auto
+                minmax(0, 1fr)
+                auto;
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(176, 38, 255, 0.18),
+                    transparent 36%
+                ),
+                radial-gradient(
+                    circle at bottom right,
+                    rgba(0, 245, 212, 0.13),
+                    transparent 38%
+                ),
+                #07040f;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .reproductor-pasos:fullscreen
+        .visor-reproductor-pasos,
+        .reproductor-pasos:-webkit-full-screen
+        .visor-reproductor-pasos,
+        .reproductor-pasos.modo-pantalla-completa
+        .visor-reproductor-pasos {
+            width: 100%;
+            height: auto;
+            min-height: 0;
+            max-height: none;
+            border-color:
+                rgba(0, 245, 212, 0.38);
+        }
+
+        .reproductor-pasos:fullscreen
+        .controles-reproductor-pasos,
+        .reproductor-pasos:-webkit-full-screen
+        .controles-reproductor-pasos,
+        .reproductor-pasos.modo-pantalla-completa
+        .controles-reproductor-pasos {
+            padding-bottom: max(
+                4px,
+                env(safe-area-inset-bottom)
+            );
+        }
+
+        body.reproductor-pantalla-completa {
+            overflow: hidden;
+        }
+
+        @media (max-width: 767.98px) {
+            .cabecera-reproductor-pasos {
+                flex-direction: column;
+            }
+
+            .acciones-reproductor-pasos {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .boton-pantalla-completa {
+                flex: 1 1 170px;
+            }
+
+            .visor-reproductor-pasos {
+                height: clamp(
+                    370px,
+                    58vh,
+                    570px
+                );
+                min-height: 370px;
+            }
+
+            .controles-reproductor-pasos
+            > .btn {
+                flex: 1 1
+                    calc(50% - 9px);
+            }
+
+            .controles-reproductor-pasos
+            .boton-reproducir-principal {
+                order: -1;
+                flex-basis: 100%;
+            }
+
+            .reproductor-pasos:fullscreen,
+            .reproductor-pasos:-webkit-full-screen,
+            .reproductor-pasos.modo-pantalla-completa {
+                padding:
+                    12px
+                    12px
+                    max(
+                        12px,
+                        env(safe-area-inset-bottom)
+                    );
+            }
+
+            .reproductor-pasos:fullscreen
+            .cabecera-reproductor-pasos p,
+            .reproductor-pasos:-webkit-full-screen
+            .cabecera-reproductor-pasos p,
+            .reproductor-pasos.modo-pantalla-completa
+            .cabecera-reproductor-pasos p {
+                display: none;
+            }
+        }
+
+        @media (max-height: 650px) {
+            .visor-reproductor-pasos {
+                height: 330px;
+                min-height: 330px;
+            }
+
+            .reproductor-pasos:fullscreen
+            .cabecera-reproductor-pasos,
+            .reproductor-pasos:-webkit-full-screen
+            .cabecera-reproductor-pasos,
+            .reproductor-pasos.modo-pantalla-completa
+            .cabecera-reproductor-pasos {
+                margin-bottom: 8px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    {% set modo_actual =
+        modo_activo | default("una_variable")
+    %}
+
+    {% set ecuaciones_guardadas =
+        request.form.getlist("funciones_sistema")
+    %}
+
+    {% set valores_guardados =
+        request.form.getlist("valores_iniciales_sistema")
+    %}
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a
+                class="navbar-brand fw-bold"
+                href="{{ url_for('inicio') }}"
+            >
+                RaphSolve
+            </a>
+
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menuPrincipal"
+                aria-controls="menuPrincipal"
+                aria-expanded="false"
+                aria-label="Mostrar navegación"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div
+                id="menuPrincipal"
+                class="collapse navbar-collapse"
+            >
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a
+                            class="nav-link active"
+                            href="{{ url_for('inicio') }}"
+                        >
+                            Resolver
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('aprende') }}"
+                        >
+                            Aprende
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('ejercicios') }}"
+                        >
+                            Ejercicios
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('practica') }}"
+                        >
+                            Práctica
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('historial') }}"
+                        >
+                            Historial
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('calculadora') }}"
+                        >
+                            Calculadora
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        <section class="text-center mb-5">
+            <h1 class="titulo-principal">
+                Método de Newton-Raphson
+            </h1>
+
+            <p class="subtitulo">
+                Resuelve funciones de una variable y sistemas
+                no lineales de hasta ocho variables.
+            </p>
+        </section>
+
+        <section class="tarjeta-principal">
+            <div
+                class="d-flex flex-column flex-lg-row
+                       justify-content-between align-items-lg-center
+                       gap-3 mb-4"
+            >
+                <div>
+                    <h2 class="h4 mb-1">
+                        Resolver ejercicio
+                    </h2>
+
+                    <p class="text-secondary mb-0">
+                        Selecciona el tipo de problema que deseas resolver.
+                    </p>
+                </div>
+
+                <div
+                    class="selector-modo-newton"
+                    role="group"
+                    aria-label="Tipo de problema"
+                >
+                    <input
+                        id="modo-una-variable"
+                        class="btn-check"
+                        type="radio"
+                        name="modo"
+                        value="una_variable"
+                        form="formulario-newton"
+                        autocomplete="off"
+                        {% if modo_actual != "sistema" %}
+                            checked
+                        {% endif %}
+                    >
+
+                    <label
+                        for="modo-una-variable"
+                        class="btn boton-selector-modo"
+                    >
+                        Una variable
+                    </label>
+
+                    <input
+                        id="modo-sistema"
+                        class="btn-check"
+                        type="radio"
+                        name="modo"
+                        value="sistema"
+                        form="formulario-newton"
+                        autocomplete="off"
+                        {% if modo_actual == "sistema" %}
+                            checked
+                        {% endif %}
+                    >
+
+                    <label
+                        for="modo-sistema"
+                        class="btn boton-selector-modo"
+                    >
+                        Sistema de variables
+                    </label>
+                </div>
+            </div>
+
+            <form
+                id="formulario-newton"
+                method="POST"
+            >
+                <section
+                    id="panel-una-variable"
+                    class="panel-modo-newton"
+                >
+                    <div class="encabezado-panel-modo mb-4">
+                        <span class="insignia-modo">
+                            1D
+                        </span>
+
+                        <div>
+                            <h3 class="h5 mb-1">
+                                Newton-Raphson de una variable
+                            </h3>
+
+                            <p class="text-secondary mb-0">
+                                Resuelve una ecuación de la forma
+                                \(f(x)=0\).
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label
+                            for="funcion"
+                            class="form-label"
+                        >
+                            Función
+                        </label>
+
+                        <input
+                            id="funcion"
+                            name="funcion"
+                            type="text"
+                            class="form-control"
+                            placeholder="Ejemplo: x^3 - x - 2"
+                            value="{{ request.form.get(
+                                'funcion',
+                                request.args.get('funcion', '')
+                            ) }}"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label
+                            for="valor_inicial"
+                            class="form-label"
+                        >
+                            Valor inicial \(x_0\)
+                        </label>
+
+                        <input
+                            id="valor_inicial"
+                            name="valor_inicial"
+                            type="number"
+                            step="any"
+                            class="form-control"
+                            value="{{ request.form.get(
+                                'valor_inicial',
+                                request.args.get(
+                                    'valor_inicial',
+                                    '1.5'
+                                )
+                            ) }}"
+                        >
+                    </div>
+                </section>
+
+                <section
+                    id="panel-sistema"
+                    class="panel-modo-newton d-none"
+                >
+                    <div class="encabezado-panel-modo mb-4">
+                        <span class="insignia-modo insignia-modo-sistema">
+                            ND
+                        </span>
+
+                        <div>
+                            <h3 class="h5 mb-1">
+                                Newton-Raphson multivariable
+                            </h3>
+
+                            <p class="text-secondary mb-0">
+                                Resuelve un sistema usando su matriz
+                                Jacobiana.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        Debe existir una ecuación por cada variable.
+                        Puedes trabajar con sistemas de 2 a 8 variables.
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-4 mb-3">
+                            <label
+                                for="cantidad_variables"
+                                class="form-label"
+                            >
+                                Número de variables
+                            </label>
+
+                            <input
+                                id="cantidad_variables"
+                                name="cantidad_variables"
+                                type="number"
+                                class="form-control"
+                                min="2"
+                                max="8"
+                                value="{{ request.form.get(
+                                    'cantidad_variables',
+                                    '2'
+                                ) }}"
+                            >
+                        </div>
+
+                        <div class="col-lg-8 mb-3">
+                            <label
+                                for="variables_sistema"
+                                class="form-label"
+                            >
+                                Variables
+                            </label>
+
+                            <input
+                                id="variables_sistema"
+                                name="variables_sistema"
+                                type="text"
+                                class="form-control"
+                                placeholder="Ejemplo: x, y"
+                                value="{{ request.form.get(
+                                    'variables_sistema',
+                                    'x, y'
+                                ) }}"
+                            >
+
+                            <div class="form-text texto-ayuda-neon">
+                                Sepáralas con comas. Ejemplo:
+                                <strong>x, y, z</strong>.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xl-7 mb-3">
+                            <div
+                                class="d-flex justify-content-between
+                                       align-items-center gap-3 mb-2"
+                            >
+                                <label class="form-label mb-0">
+                                    Ecuaciones del sistema
+                                </label>
+
+                                <span class="etiqueta-jacobiana">
+                                    \(F(X)=0\)
+                                </span>
+                            </div>
+
+                            <div
+                                id="contenedor-ecuaciones-sistema"
+                                class="contenedor-campos-sistema"
+                            ></div>
+                        </div>
+
+                        <div class="col-xl-5 mb-3">
+                            <div
+                                class="d-flex justify-content-between
+                                       align-items-center gap-3 mb-2"
+                            >
+                                <label class="form-label mb-0">
+                                    Vector inicial
+                                </label>
+
+                                <span class="etiqueta-jacobiana">
+                                    \(X_0\)
+                                </span>
+                            </div>
+
+                            <div
+                                id="contenedor-valores-sistema"
+                                class="contenedor-campos-sistema"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div class="formula-sistema">
+                        \[
+                            J(X_n)\Delta X_n=F(X_n),
+                            \qquad
+                            X_{n+1}=X_n-\Delta X_n
+                        \]
+                    </div>
+                </section>
+
+                <div class="row mt-3">
+                    <div class="col-md-6 mb-3">
+                        <label
+                            for="tolerancia"
+                            class="form-label"
+                        >
+                            Tolerancia
+                        </label>
+
+                        <input
+                            id="tolerancia"
+                            name="tolerancia"
+                            type="number"
+                            step="any"
+                            class="form-control"
+                            value="{{ request.form.get(
+                                'tolerancia',
+                                request.args.get(
+                                    'tolerancia',
+                                    '0.0001'
+                                )
+                            ) }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label
+                            for="max_iteraciones"
+                            class="form-label"
+                        >
+                            Iteraciones máximas
+                        </label>
+
+                        <input
+                            id="max_iteraciones"
+                            name="max_iteraciones"
+                            type="number"
+                            class="form-control"
+                            value="{{ request.form.get(
+                                'max_iteraciones',
+                                request.args.get(
+                                    'max_iteraciones',
+                                    '100'
+                                )
+                            ) }}"
+                            min="1"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <button
+                    type="submit"
+                    class="btn boton-principal w-100"
+                >
+                    Resolver con Newton-Raphson
+                </button>
+            </form>
+        </section>
+
+        <script
+            id="datos-formulario-sistema"
+            type="application/json"
+        >
+            {{
+                {
+                    "cantidad":
+                        request.form.get(
+                            "cantidad_variables",
+                            "2"
+                        ),
+                    "variables":
+                        request.form.get(
+                            "variables_sistema",
+                            "x, y"
+                        ),
+                    "ecuaciones":
+                        ecuaciones_guardadas
+                        if ecuaciones_guardadas
+                        else [],
+                    "valores":
+                        valores_guardados
+                        if valores_guardados
+                        else [
+                            "1.5",
+                            "1"
+                        ]
+                } | tojson
+            }}
+        </script>
+
+        {% if mensaje_error %}
+            <div class="alert alert-danger mt-4 mensaje-animado">
+                {{ mensaje_error }}
+            </div>
+        {% endif %}
+
+        {% if resultado %}
+            {% set iteraciones_visibles =
+                resultado.iteraciones
+                if resultado.convergio
+                else resultado.iteraciones[:8]
+            %}
+
+            <section class="tarjeta-resultado mt-4">
+                <h2 class="h4">
+                    Resultado
+                </h2>
+
+                <p>
+                    <strong>Función:</strong>
+                    \( f(x) = {{ resultado.funcion_latex }} \)
+                </p>
+
+                <p>
+                    <strong>Derivada:</strong>
+                    \( f'(x) = {{ resultado.derivada_latex }} \)
+                </p>
+
+                {% if resultado.convergio %}
+                    <p>
+                        <strong>Raíz aproximada:</strong>
+                        {{ resultado.raiz | numero(8) }}
+                    </p>
+
+                    <div class="alert alert-success mb-0">
+                        El método convergió correctamente.
+                    </div>
+                {% else %}
+                    <p>
+                        <strong>Última aproximación calculada:</strong>
+                        {{
+                            resultado.get(
+                                "ultima_aproximacion",
+                                0
+                            ) | numero(8)
+                        }}
+                    </p>
+
+                    <div class="alert alert-warning mb-0">
+                        El método no convergió. La función podría no
+                        tener raíces reales o el valor inicial podría
+                        no ser adecuado.
+                    </div>
+                {% endif %}
+            </section>
+
+            <section
+                id="reproductor-pasos"
+                class="tarjeta-principal mt-4 reproductor-pasos"
+                data-tipo-reproductor="una-variable"
+            >
+                <div class="cabecera-reproductor-pasos">
+                    <div>
+                        <h2 class="h4 mb-1">
+                            Explicación paso a paso
+                        </h2>
+
+                        <p class="text-secondary mb-0">
+                            {% if resultado.convergio %}
+                                Revisa cómo se obtiene cada aproximación.
+                            {% else %}
+                                El método no convergió; se muestran las
+                                primeras aproximaciones para observar
+                                su comportamiento.
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="acciones-reproductor-pasos">
+                        <span
+                            id="contador-pasos"
+                            class="contador-pasos"
+                        >
+                            Paso 1
+                        </span>
+
+                        <button
+                            id="pantalla-completa-pasos"
+                            type="button"
+                            class="btn boton-pantalla-completa"
+                            aria-controls="reproductor-pasos"
+                            aria-pressed="false"
+                            title="Ver la explicación en pantalla completa"
+                        >
+                            <span
+                                class="icono-pantalla-completa"
+                                aria-hidden="true"
+                            >
+                                ⛶
+                            </span>
+
+                            <span class="texto-pantalla-completa">
+                                Pantalla completa
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="progress mb-3">
+                    <div
+                        id="barra-pasos"
+                        class="progress-bar barra-pasos"
+                        role="progressbar"
+                        style="width: 0%;"
+                    ></div>
+                </div>
+
+                <div
+                    id="visor-pasos"
+                    class="visor-reproductor-pasos"
+                    tabindex="0"
+                >
+                    <div
+                        id="contenido-paso"
+                        class="contenido-paso"
+                    >
+                        Cargando explicación...
+                    </div>
+                </div>
+
+                <div class="controles-reproductor-pasos">
+                    <button
+                        id="paso-anterior"
+                        type="button"
+                        class="btn boton-secundario"
+                    >
+                        Anterior
+                    </button>
+
+                    <button
+                        id="reproducir-pasos"
+                        type="button"
+                        class="btn boton-principal
+                               boton-reproducir-principal"
+                    >
+                        Reproducir
+                    </button>
+
+                    <button
+                        id="paso-siguiente"
+                        type="button"
+                        class="btn boton-secundario"
+                    >
+                        Siguiente
+                    </button>
+
+                    <button
+                        id="reiniciar-pasos"
+                        type="button"
+                        class="btn btn-outline-secondary"
+                    >
+                        Reiniciar
+                    </button>
+                </div>
+            </section>
+
+            <section class="tarjeta-principal mt-4">
+                <h2 class="h4 mb-3">
+                    Tabla de iteraciones
+                </h2>
+
+                {% if not resultado.convergio %}
+                    <div class="alert alert-info">
+                        Se muestran las primeras 8 de
+                        {{ resultado.iteraciones | length }}
+                        iteraciones calculadas.
+                    </div>
+                {% endif %}
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Iteración</th>
+                                <th>x actual</th>
+                                <th>f(x)</th>
+                                <th>f'(x)</th>
+                                <th>x siguiente</th>
+                                <th>Error aproximado</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for fila in iteraciones_visibles %}
+                                <tr
+                                    class="fila-animada"
+                                    style="--numero-fila: {{ loop.index }};"
+                                >
+                                    <td>{{ fila.numero }}</td>
+                                    <td>{{ fila.x_actual | numero(6) }}</td>
+                                    <td>{{ fila.fx | numero(6) }}</td>
+                                    <td>{{ fila.derivada | numero(6) }}</td>
+                                    <td>{{ fila.x_siguiente | numero(6) }}</td>
+                                    <td>{{ fila.error | numero(8) }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="tarjeta-principal mt-4">
+                <div
+                    class="d-flex flex-column flex-lg-row
+                           justify-content-between align-items-lg-center
+                           gap-3 mb-3"
+                >
+                    <div>
+                        <h2 class="h4 mb-1">
+                            Gráfica del método
+                        </h2>
+
+                        <p class="text-secondary mb-0">
+                            {% if resultado.convergio %}
+                                Observa cómo las tangentes se acercan a la raíz.
+                            {% else %}
+                                El método no convergió; se muestran solamente
+                                las primeras aproximaciones.
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="controles-grafica-neon">
+                        <button
+                            id="modo-grafica-2d"
+                            type="button"
+                            class="btn boton-modo-grafica activo"
+                        >
+                            Vista 2D
+                        </button>
+
+                        <button
+                            id="modo-grafica-3d"
+                            type="button"
+                            class="btn boton-modo-grafica"
+                        >
+                            Vista 3D
+                        </button>
+
+                        <button
+                            id="boton-animar"
+                            type="button"
+                            class="btn boton-animacion"
+                        >
+                            Reproducir
+                        </button>
+                    </div>
+                </div>
+
+                <div class="leyenda-grafica-3d mb-3">
+                    <span class="punto-leyenda turquesa"></span>
+                    Función
+
+                    <span class="punto-leyenda rosa"></span>
+                    Tangentes
+
+                    <span class="punto-leyenda verde"></span>
+                    Raíz
+
+                    <span class="ms-lg-3 text-secondary">
+                        En 3D, la profundidad representa cada iteración.
+                    </span>
+                </div>
+
+                <div
+                    id="grafica-newton-2d"
+                    class="grafica-neon"
+                ></div>
+
+                <div
+                    id="grafica-newton-3d"
+                    class="grafica-neon d-none"
+                ></div>
+            </section>
+
+            <script
+                id="datos-grafica"
+                type="application/json"
+            >
+                {{ resultado.grafica | tojson }}
+            </script>
+
+            <script
+                id="datos-pasos"
+                type="application/json"
+            >
+                {{
+                    {
+                        "funcion_latex": resultado.funcion_latex,
+                        "derivada_latex": resultado.derivada_latex,
+                        "raiz": resultado.raiz,
+                        "ultima_aproximacion":
+                            resultado.get(
+                                "ultima_aproximacion",
+                                resultado.raiz
+                            ),
+                        "convergio": resultado.convergio,
+                        "iteraciones": iteraciones_visibles
+                    } | tojson
+                }}
+            </script>
+
+            {% if resultado.convergio %}
+                <script
+                    id="datos-historial"
+                    type="application/json"
+                >
+                    {{
+                        {
+                            "funcion":
+                                request.form.get(
+                                    "funcion",
+                                    ""
+                                ),
+                            "valor_inicial":
+                                request.form.get(
+                                    "valor_inicial",
+                                    ""
+                                ),
+                            "tolerancia":
+                                request.form.get(
+                                    "tolerancia",
+                                    ""
+                                ),
+                            "max_iteraciones":
+                                request.form.get(
+                                    "max_iteraciones",
+                                    "100"
+                                ),
+                            "raiz": resultado.raiz,
+                            "iteraciones":
+                                resultado.iteraciones | length,
+                            "convergio": resultado.convergio
+                        } | tojson
+                    }}
+                </script>
+            {% endif %}
+        {% endif %}
+
+        {% if resultado_sistema %}
+            {% set iteraciones_sistema_visibles =
+                resultado_sistema.iteraciones
+                if resultado_sistema.convergio
+                else resultado_sistema.iteraciones[:8]
+            %}
+
+            {% set aproximacion_sistema =
+                resultado_sistema.solucion
+                if resultado_sistema.convergio
+                else resultado_sistema.ultima_aproximacion
+            %}
+
+            <section class="tarjeta-resultado mt-4">
+                <div
+                    class="d-flex flex-column flex-lg-row
+                           justify-content-between gap-3"
+                >
+                    <div>
+                        <h2 class="h4">
+                            Resultado del sistema
+                        </h2>
+
+                        <p class="text-secondary mb-0">
+                            Sistema de
+                            {{ resultado_sistema.variables | length }}
+                            variables.
+                        </p>
+                    </div>
+
+                    <span class="insignia-sistema-avanzado">
+                        Jacobiana automática
+                    </span>
+                </div>
+
+                <div class="lista-funciones-sistema mt-4">
+                    {% for funcion_latex
+                       in resultado_sistema.funciones_latex %}
+                        <div class="funcion-sistema-item">
+                            \[
+                                f_{{ loop.index }}(X)
+                                =
+                                {{ funcion_latex }}
+                                =
+                                0
+                            \]
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-4">
+                    <h3 class="h5">
+                        Matriz Jacobiana
+                    </h3>
+
+                    <div class="formula-sistema">
+                        \[
+                            J(X)
+                            =
+                            {{ resultado_sistema.jacobiana_latex }}
+                        \]
+                    </div>
+                </div>
+
+                <h3 class="h5 mt-4">
+                    {% if resultado_sistema.convergio %}
+                        Solución aproximada
+                    {% else %}
+                        Última aproximación calculada
+                    {% endif %}
+                </h3>
+
+                <div class="rejilla-solucion-sistema">
+                    {% for variable
+                       in resultado_sistema.variables %}
+                        <article class="valor-solucion-sistema">
+                            <span>{{ variable }}</span>
+
+                            <strong>
+                                {{
+                                    aproximacion_sistema[variable]
+                                    | numero(8)
+                                }}
+                            </strong>
+                        </article>
+                    {% endfor %}
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <div class="metrica-sistema">
+                            <span>Error final</span>
+
+                            <strong>
+                                {{
+                                    resultado_sistema.error_final
+                                    | numero(10)
+                                }}
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="metrica-sistema">
+                            <span>Norma del residuo</span>
+
+                            <strong>
+                                {{
+                                    resultado_sistema.residuo_final
+                                    | numero(10)
+                                }}
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+
+                {% if resultado_sistema.convergio %}
+                    <div class="alert alert-success mt-4 mb-0">
+                        El sistema convergió correctamente.
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning mt-4 mb-0">
+                        El sistema no alcanzó la tolerancia indicada.
+                        Prueba otros valores iniciales o aumenta el
+                        número de iteraciones.
+                    </div>
+                {% endif %}
+            </section>
+
+            <section
+                id="reproductor-pasos-sistema"
+                class="tarjeta-principal mt-4 reproductor-pasos"
+                data-tipo-reproductor="sistema"
+            >
+                <div class="cabecera-reproductor-pasos">
+                    <div>
+                        <h2 class="h4 mb-1">
+                            Explicación paso a paso del sistema
+                        </h2>
+
+                        <p class="text-secondary mb-0">
+                            Revisa la evaluación de \(F(X_n)\), la
+                            Jacobiana, la corrección \(\Delta X_n\)
+                            y la nueva aproximación.
+                        </p>
+                    </div>
+
+                    <div class="acciones-reproductor-pasos">
+                        <span
+                            id="contador-pasos-sistema"
+                            class="contador-pasos"
+                        >
+                            Paso 1
+                        </span>
+
+                        <button
+                            id="pantalla-completa-pasos-sistema"
+                            type="button"
+                            class="btn boton-pantalla-completa"
+                            aria-controls="reproductor-pasos-sistema"
+                            aria-pressed="false"
+                            title="Ver la explicación en pantalla completa"
+                        >
+                            <span
+                                class="icono-pantalla-completa"
+                                aria-hidden="true"
+                            >
+                                ⛶
+                            </span>
+
+                            <span class="texto-pantalla-completa">
+                                Pantalla completa
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="progress mb-3">
+                    <div
+                        id="barra-pasos-sistema"
+                        class="progress-bar barra-pasos"
+                        role="progressbar"
+                        style="width: 0%;"
+                    ></div>
+                </div>
+
+                <div
+                    id="visor-pasos-sistema"
+                    class="visor-reproductor-pasos"
+                    tabindex="0"
+                >
+                    <div
+                        id="contenido-paso-sistema"
+                        class="contenido-paso contenido-paso-sistema"
+                    >
+                        Cargando explicación del sistema...
+                    </div>
+                </div>
+
+                <div class="controles-reproductor-pasos">
+                    <button
+                        id="paso-anterior-sistema"
+                        type="button"
+                        class="btn boton-secundario"
+                    >
+                        Anterior
+                    </button>
+
+                    <button
+                        id="reproducir-pasos-sistema"
+                        type="button"
+                        class="btn boton-principal
+                               boton-reproducir-principal"
+                    >
+                        Reproducir
+                    </button>
+
+                    <button
+                        id="paso-siguiente-sistema"
+                        type="button"
+                        class="btn boton-secundario"
+                    >
+                        Siguiente
+                    </button>
+
+                    <button
+                        id="reiniciar-pasos-sistema"
+                        type="button"
+                        class="btn btn-outline-secondary"
+                    >
+                        Reiniciar
+                    </button>
+                </div>
+            </section>
+
+            <section class="tarjeta-principal mt-4">
+                <h2 class="h4 mb-3">
+                    Tabla de iteraciones del sistema
+                </h2>
+
+                {% if not resultado_sistema.convergio %}
+                    <div class="alert alert-info">
+                        Se muestran las primeras 8 de
+                        {{ resultado_sistema.iteraciones | length }}
+                        iteraciones calculadas.
+                    </div>
+                {% endif %}
+
+                <div class="table-responsive">
+                    <table
+                        class="table table-hover align-middle
+                               tabla-sistema"
+                    >
+                        <thead>
+                            <tr>
+                                <th>Iteración</th>
+
+                                {% for variable
+                                   in resultado_sistema.variables %}
+                                    <th>
+                                        {{ variable }} actual
+                                    </th>
+                                {% endfor %}
+
+                                {% for variable
+                                   in resultado_sistema.variables %}
+                                    <th>
+                                        {{ variable }} siguiente
+                                    </th>
+                                {% endfor %}
+
+                                <th>Error</th>
+                                <th>Residuo</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for fila
+                               in iteraciones_sistema_visibles %}
+                                <tr
+                                    class="fila-animada"
+                                    style="--numero-fila: {{ loop.index }};"
+                                >
+                                    <td>{{ fila.numero }}</td>
+
+                                    {% for valor in fila.actual %}
+                                        <td>
+                                            {{ valor | numero(6) }}
+                                        </td>
+                                    {% endfor %}
+
+                                    {% for valor in fila.siguiente %}
+                                        <td>
+                                            {{ valor | numero(6) }}
+                                        </td>
+                                    {% endfor %}
+
+                                    <td>
+                                        {{ fila.error | numero(8) }}
+                                    </td>
+
+                                    <td>
+                                        {{ fila.residuo | numero(8) }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="tarjeta-principal mt-4">
+                <div
+                    class="d-flex flex-column flex-lg-row
+                           justify-content-between align-items-lg-center
+                           gap-3 mb-3"
+                >
+                    <div>
+                        <h2 class="h4 mb-1">
+                            Visualización avanzada
+                        </h2>
+
+                        <p class="text-secondary mb-0">
+                            {% if
+                                resultado_sistema.variables | length == 2
+                            %}
+                                Las dos superficies representan las
+                                ecuaciones del sistema. La solución se
+                                encuentra donde ambas alcanzan \(z=0\).
+                            {% else %}
+                                Se muestra la trayectoria de las primeras
+                                tres variables. Las demás continúan
+                                calculándose en el método.
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="controles-grafica-neon">
+                        <button
+                            id="boton-animar-sistema"
+                            type="button"
+                            class="btn boton-animacion"
+                        >
+                            Animar trayectoria
+                        </button>
+
+                        <button
+                            id="boton-rotar-sistema"
+                            type="button"
+                            class="btn boton-modo-grafica activo"
+                        >
+                            Rotación activa
+                        </button>
+                    </div>
+                </div>
+
+                <div
+                    id="grafica-sistema-3d"
+                    class="grafica-neon grafica-sistema-3d"
+                ></div>
+
+                <div class="mt-4">
+                    <h3 class="h5 mb-1">
+                        Convergencia
+                    </h3>
+
+                    <p class="text-secondary">
+                        Compara el error aproximado con la norma del
+                        residuo en cada iteración.
+                    </p>
+
+                    <div
+                        id="grafica-error-sistema"
+                        class="grafica-neon grafica-error-sistema"
+                    ></div>
+                </div>
+            </section>
+
+            <script
+                id="datos-pasos-sistema"
+                type="application/json"
+            >
+                {{
+                    {
+                        "variables":
+                            resultado_sistema.variables,
+                        "funciones_latex":
+                            resultado_sistema.funciones_latex,
+                        "jacobiana_latex":
+                            resultado_sistema.jacobiana_latex,
+                        "solucion":
+                            resultado_sistema.solucion,
+                        "ultima_aproximacion":
+                            resultado_sistema.get(
+                                "ultima_aproximacion",
+                                resultado_sistema.solucion
+                            ),
+                        "convergio":
+                            resultado_sistema.convergio,
+                        "iteraciones":
+                            iteraciones_sistema_visibles
+                    } | tojson
+                }}
+            </script>
+
+
+            <script
+                id="datos-historial-sistema"
+                type="application/json"
+            >
+                {{
+                    {
+                        "variables":
+                            resultado_sistema.variables,
+                        "ecuaciones":
+                            request.form.getlist(
+                                "funciones_sistema"
+                            ),
+                        "valores_iniciales":
+                            request.form.getlist(
+                                "valores_iniciales_sistema"
+                            ),
+                        "tolerancia":
+                            request.form.get(
+                                "tolerancia",
+                                ""
+                            ),
+                        "max_iteraciones":
+                            request.form.get(
+                                "max_iteraciones",
+                                "100"
+                            ),
+                        "solucion":
+                            resultado_sistema.solucion
+                            if resultado_sistema.convergio
+                            else resultado_sistema.get(
+                                "ultima_aproximacion",
+                                {}
+                            ),
+                        "iteraciones":
+                            resultado_sistema.iteraciones
+                            | length,
+                        "convergio":
+                            resultado_sistema.convergio
+                    } | tojson
+                }}
+            </script>
+
+            <script
+                id="datos-grafica-sistema"
+                type="application/json"
+            >
+                {{
+                    {
+                        "grafica":
+                            resultado_sistema.grafica,
+                        "iteraciones":
+                            resultado_sistema.iteraciones,
+                        "variables":
+                            resultado_sistema.variables,
+                        "convergio":
+                            resultado_sistema.convergio
+                    } | tojson
+                }}
+            </script>
+        {% endif %}
+    </main>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <script
+        src="{{ url_for(
+            'static',
+            filename='js/formulario_sistemas.js'
+        ) }}">
+    </script>
+
+    {% if resultado %}
+        <script
+            src="{{ url_for('static', filename='js/grafica.js') }}">
+        </script>
+
+        <script
+            src="{{ url_for('static', filename='js/pasos.js') }}">
+        </script>
+
+        <script
+            src="{{ url_for('static', filename='js/historial.js') }}">
+        </script>
+    {% endif %}
+
+    {% if resultado_sistema %}
+        <script
+            src="{{ url_for(
+                'static',
+                filename='js/historial.js'
+            ) }}">
+        </script>
+
+        <script
+            src="{{ url_for(
+                'static',
+                filename='js/pasos_sistemas.js'
+            ) }}">
+        </script>
+
+        <script
+            src="{{ url_for(
+                'static',
+                filename='js/grafica_sistemas.js'
+            ) }}">
+        </script>
+    {% endif %}
+
+    <script
+        src="{{ url_for('static', filename='js/fondo-neon.js') }}">
+    </script>
+
+    <script>
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+                const reproductores = [
+                    {
+                        contenedor:
+                            "reproductor-pasos",
+                        visor:
+                            "visor-pasos",
+                        contenido:
+                            "contenido-paso",
+                        botonPantalla:
+                            "pantalla-completa-pasos",
+                        botonReproducir:
+                            "reproducir-pasos"
+                    },
+                    {
+                        contenedor:
+                            "reproductor-pasos-sistema",
+                        visor:
+                            "visor-pasos-sistema",
+                        contenido:
+                            "contenido-paso-sistema",
+                        botonPantalla:
+                            "pantalla-completa-pasos-sistema",
+                        botonReproducir:
+                            "reproducir-pasos-sistema"
+                    }
+                ];
+
+                const elementos = reproductores
+                    .map(configuracion => ({
+                        configuracion,
+                        contenedor:
+                            document.getElementById(
+                                configuracion.contenedor
+                            ),
+                        visor:
+                            document.getElementById(
+                                configuracion.visor
+                            ),
+                        contenido:
+                            document.getElementById(
+                                configuracion.contenido
+                            ),
+                        botonPantalla:
+                            document.getElementById(
+                                configuracion.botonPantalla
+                            ),
+                        botonReproducir:
+                            document.getElementById(
+                                configuracion.botonReproducir
+                            )
+                    }))
+                    .filter(elemento =>
+                        elemento.contenedor
+                        && elemento.visor
+                        && elemento.contenido
+                        && elemento.botonPantalla
+                    );
+
+                function estaReproduciendo(
+                    boton
+                ) {
+                    if (!boton) {
+                        return false;
+                    }
+
+                    const texto = boton.textContent
+                        .trim()
+                        .toLowerCase();
+
+                    return (
+                        texto.includes("pausar")
+                        || texto.includes("detener")
+                        || boton.classList.contains(
+                            "reproduciendo"
+                        )
+                    );
+                }
+
+                function pausarReproduccion(
+                    elemento
+                ) {
+                    if (
+                        estaReproduciendo(
+                            elemento.botonReproducir
+                        )
+                    ) {
+                        elemento.botonReproducir.click();
+                    }
+                }
+
+                function esPantallaCompleta(
+                    elemento
+                ) {
+                    return (
+                        document.fullscreenElement
+                            === elemento.contenedor
+                        || document.webkitFullscreenElement
+                            === elemento.contenedor
+                        || elemento.contenedor.classList.contains(
+                            "modo-pantalla-completa"
+                        )
+                    );
+                }
+
+                function actualizarBoton(
+                    elemento
+                ) {
+                    const activo =
+                        esPantallaCompleta(
+                            elemento
+                        );
+
+                    const texto =
+                        elemento.botonPantalla.querySelector(
+                            ".texto-pantalla-completa"
+                        );
+
+                    const icono =
+                        elemento.botonPantalla.querySelector(
+                            ".icono-pantalla-completa"
+                        );
+
+                    elemento.botonPantalla.setAttribute(
+                        "aria-pressed",
+                        String(activo)
+                    );
+
+                    elemento.botonPantalla.title =
+                        activo
+                            ? "Salir de pantalla completa"
+                            : "Ver la explicación en pantalla completa";
+
+                    if (texto) {
+                        texto.textContent =
+                            activo
+                                ? "Salir de pantalla completa"
+                                : "Pantalla completa";
+                    }
+
+                    if (icono) {
+                        icono.textContent =
+                            activo
+                                ? "✕"
+                                : "⛶";
+                    }
+                }
+
+                function activarModoSimulado(
+                    elemento
+                ) {
+                    elementos.forEach(otro => {
+                        if (otro !== elemento) {
+                            otro.contenedor.classList.remove(
+                                "modo-pantalla-completa"
+                            );
+                        }
+                    });
+
+                    elemento.contenedor.classList.add(
+                        "modo-pantalla-completa"
+                    );
+
+                    document.body.classList.add(
+                        "reproductor-pantalla-completa"
+                    );
+
+                    actualizarTodosLosBotones();
+                }
+
+                function salirModoSimulado() {
+                    elementos.forEach(elemento => {
+                        elemento.contenedor.classList.remove(
+                            "modo-pantalla-completa"
+                        );
+                    });
+
+                    document.body.classList.remove(
+                        "reproductor-pantalla-completa"
+                    );
+
+                    actualizarTodosLosBotones();
+                }
+
+                async function abrirPantallaCompleta(
+                    elemento
+                ) {
+                    pausarReproduccion(
+                        elemento
+                    );
+
+                    elemento.visor.scrollTop = 0;
+
+                    try {
+                        if (
+                            elemento.contenedor.requestFullscreen
+                        ) {
+                            await elemento.contenedor.requestFullscreen();
+                        } else if (
+                            elemento.contenedor.webkitRequestFullscreen
+                        ) {
+                            elemento.contenedor.webkitRequestFullscreen();
+                        } else {
+                            activarModoSimulado(
+                                elemento
+                            );
+                        }
+                    } catch (error) {
+                        activarModoSimulado(
+                            elemento
+                        );
+                    }
+
+                    actualizarBoton(
+                        elemento
+                    );
+                }
+
+                async function cerrarPantallaCompleta(
+                    elemento
+                ) {
+                    pausarReproduccion(
+                        elemento
+                    );
+
+                    if (
+                        document.fullscreenElement
+                        && document.exitFullscreen
+                    ) {
+                        await document.exitFullscreen();
+                    } else if (
+                        document.webkitFullscreenElement
+                        && document.webkitExitFullscreen
+                    ) {
+                        document.webkitExitFullscreen();
+                    }
+
+                    salirModoSimulado();
+                    actualizarBoton(
+                        elemento
+                    );
+                }
+
+                function actualizarTodosLosBotones() {
+                    elementos.forEach(
+                        actualizarBoton
+                    );
+
+                    if (
+                        !document.fullscreenElement
+                        && !document.webkitFullscreenElement
+                        && !elementos.some(elemento =>
+                            elemento.contenedor.classList.contains(
+                                "modo-pantalla-completa"
+                            )
+                        )
+                    ) {
+                        document.body.classList.remove(
+                            "reproductor-pantalla-completa"
+                        );
+                    }
+                }
+
+                elementos.forEach(elemento => {
+                    /*
+                     * Evita que pasos.js mueva toda la página.
+                     * Cuando solicite llevar el paso a la vista,
+                     * solamente se desplaza el visor interno.
+                     */
+                    elemento.contenido.scrollIntoView =
+                        function () {
+                            elemento.visor.scrollTo({
+                                top: 0,
+                                left: 0,
+                                behavior: "smooth"
+                            });
+                        };
+
+                    /*
+                     * Cada cambio de paso vuelve al inicio del
+                     * contenido, sin desplazar el documento.
+                     */
+                    const observador =
+                        new MutationObserver(() => {
+                            requestAnimationFrame(
+                                () => {
+                                    elemento.visor.scrollTop = 0;
+                                    elemento.visor.scrollLeft = 0;
+                                }
+                            );
+                        });
+
+                    observador.observe(
+                        elemento.contenido,
+                        {
+                            childList: true,
+                            subtree: true,
+                            characterData: true
+                        }
+                    );
+
+                    elemento.botonPantalla.addEventListener(
+                        "click",
+                        () => {
+                            if (
+                                esPantallaCompleta(
+                                    elemento
+                                )
+                            ) {
+                                cerrarPantallaCompleta(
+                                    elemento
+                                );
+                            } else {
+                                abrirPantallaCompleta(
+                                    elemento
+                                );
+                            }
+                        }
+                    );
+
+                    actualizarBoton(
+                        elemento
+                    );
+                });
+
+                document.addEventListener(
+                    "fullscreenchange",
+                    actualizarTodosLosBotones
+                );
+
+                document.addEventListener(
+                    "webkitfullscreenchange",
+                    actualizarTodosLosBotones
+                );
+
+                document.addEventListener(
+                    "keydown",
+                    evento => {
+                        if (evento.key !== "Escape") {
+                            return;
+                        }
+
+                        const simulado =
+                            elementos.find(elemento =>
+                                elemento.contenedor.classList.contains(
+                                    "modo-pantalla-completa"
+                                )
+                            );
+
+                        if (simulado) {
+                            pausarReproduccion(
+                                simulado
+                            );
+
+                            salirModoSimulado();
+                        }
+                    }
+                );
+            }
+        );
+    </script>
+
+</body>
+</html>

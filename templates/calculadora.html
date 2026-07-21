@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Calculadora | RaphSolve</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/estilos.css') }}"
+    >
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]]
+            }
+        };
+    </script>
+
+    <script
+        defer
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a
+                class="navbar-brand fw-bold"
+                href="{{ url_for('inicio') }}"
+            >
+                RaphSolve
+            </a>
+
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menuPrincipal"
+                aria-controls="menuPrincipal"
+                aria-expanded="false"
+                aria-label="Mostrar navegación"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div
+                id="menuPrincipal"
+                class="collapse navbar-collapse"
+            >
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('inicio') }}"
+                        >
+                            Resolver
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('aprende') }}"
+                        >
+                            Aprende
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('ejercicios') }}"
+                        >
+                            Ejercicios
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('practica') }}"
+                        >
+                            Práctica
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('historial') }}"
+                        >
+                            Historial
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link active"
+                            href="{{ url_for('calculadora') }}"
+                        >
+                            Calculadora
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        <section class="text-center mb-5">
+            <h1 class="titulo-principal">
+                Calculadora de RaphSolve
+            </h1>
+
+            <p class="subtitulo">
+                Realiza operaciones científicas y resuelve
+                la corrección de Newton para sistemas.
+            </p>
+        </section>
+
+        <section class="tarjeta-principal mb-4">
+            <div
+                class="d-flex flex-column flex-lg-row
+                       justify-content-between align-items-lg-center
+                       gap-3"
+            >
+                <div>
+                    <h2 class="h4 mb-1">
+                        Selecciona una herramienta
+                    </h2>
+
+                    <p class="text-secondary mb-0">
+                        Cambia entre la calculadora científica
+                        y el asistente matricial.
+                    </p>
+                </div>
+
+                <div
+                    class="selector-modo-newton"
+                    role="group"
+                    aria-label="Tipo de calculadora"
+                >
+                    <input
+                        id="modo-calculadora-cientifica"
+                        class="btn-check"
+                        type="radio"
+                        name="modo-calculadora"
+                        value="cientifica"
+                        autocomplete="off"
+                        checked
+                    >
+
+                    <label
+                        for="modo-calculadora-cientifica"
+                        class="btn boton-selector-modo"
+                    >
+                        Científica
+                    </label>
+
+                    <input
+                        id="modo-calculadora-sistemas"
+                        class="btn-check"
+                        type="radio"
+                        name="modo-calculadora"
+                        value="sistemas"
+                        autocomplete="off"
+                    >
+
+                    <label
+                        for="modo-calculadora-sistemas"
+                        class="btn boton-selector-modo"
+                    >
+                        Matrices y sistemas
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <section
+            id="panel-calculadora-cientifica"
+            class="calculadora"
+        >
+            <div class="encabezado-panel-modo mb-3">
+                <span class="insignia-modo">
+                    FX
+                </span>
+
+                <div>
+                    <h2 class="h4 mb-1">
+                        Calculadora científica
+                    </h2>
+
+                    <p class="text-secondary mb-0">
+                        Evalúa expresiones, potencias y funciones.
+                    </p>
+                </div>
+            </div>
+
+            <label
+                for="pantalla-calculadora"
+                class="form-label"
+            >
+                Operación
+            </label>
+
+            <input
+                id="pantalla-calculadora"
+                type="text"
+                class="pantalla-calculadora"
+                placeholder="0"
+                readonly
+                aria-label="Pantalla de la calculadora"
+            >
+
+            <div
+                id="mensaje-calculadora"
+                class="mensaje-calculadora"
+                aria-live="polite"
+            ></div>
+
+            <div class="teclado-calculadora">
+                <button
+                    type="button"
+                    class="tecla tecla-limpiar"
+                    data-accion="limpiar"
+                >
+                    C
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla tecla-funcion"
+                    data-accion="borrar"
+                    aria-label="Borrar último carácter"
+                >
+                    ⌫
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla tecla-funcion"
+                    data-valor="("
+                >
+                    (
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla tecla-funcion"
+                    data-valor=")"
+                >
+                    )
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla tecla-funcion"
+                    data-valor="sin("
+                >
+                    sin
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla tecla-funcion"
+                    data-valor="cos("
+                >
+                    cos
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla tecla-funcion"
+                    data-valor="tan("
+                >
+                    tan
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla tecla-operador"
+                    data-valor="/"
+                >
+                    ÷
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla tecla-funcion"
+                    data-valor="sqrt("
+                >
+                    √
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla tecla-funcion"
+                    data-valor="log("
+                >
+                    ln
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla tecla-funcion"
+                    data-valor="log10("
+                >
+                    log
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla tecla-operador"
+                    data-valor="*"
+                >
+                    ×
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla"
+                    data-valor="7"
+                >
+                    7
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla"
+                    data-valor="8"
+                >
+                    8
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla"
+                    data-valor="9"
+                >
+                    9
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla tecla-operador"
+                    data-valor="-"
+                >
+                    −
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla"
+                    data-valor="4"
+                >
+                    4
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla"
+                    data-valor="5"
+                >
+                    5
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla"
+                    data-valor="6"
+                >
+                    6
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla tecla-operador"
+                    data-valor="+"
+                >
+                    +
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla"
+                    data-valor="1"
+                >
+                    1
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla"
+                    data-valor="2"
+                >
+                    2
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla"
+                    data-valor="3"
+                >
+                    3
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla tecla-operador"
+                    data-valor="^"
+                >
+                    xʸ
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla tecla-funcion"
+                    data-valor="pi"
+                >
+                    π
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla"
+                    data-valor="0"
+                >
+                    0
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla"
+                    data-valor="."
+                >
+                    .
+                </button>
+
+                <button
+                    type="button"
+                    class="tecla tecla-igual"
+                    data-accion="calcular"
+                >
+                    =
+                </button>
+            </div>
+
+            <div class="ejemplos-calculadora mt-4">
+                <strong>Ejemplos:</strong>
+
+                <span>sqrt(25)</span>
+                <span>sin(pi / 2)</span>
+                <span>2^5</span>
+                <span>log10(100)</span>
+            </div>
+        </section>
+
+        <section
+            id="panel-calculadora-sistemas"
+            class="tarjeta-principal d-none"
+        >
+            <div
+                class="d-flex flex-column flex-xl-row
+                       justify-content-between align-items-xl-center
+                       gap-3 mb-4"
+            >
+                <div class="encabezado-panel-modo mb-0">
+                    <span
+                        class="insignia-modo insignia-modo-sistema"
+                    >
+                        J
+                    </span>
+
+                    <div>
+                        <h2 class="h4 mb-1">
+                            Corrección de Newton para sistemas
+                        </h2>
+
+                        <p class="text-secondary mb-0">
+                            Resuelve la ecuación matricial de una
+                            iteración multivariable.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <button
+                        id="cargar-ejemplo-matriz"
+                        type="button"
+                        class="btn boton-secundario"
+                    >
+                        Cargar ejemplo
+                    </button>
+
+                    <button
+                        id="limpiar-calculadora-matriz"
+                        type="button"
+                        class="btn btn-outline-danger"
+                    >
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+
+            <div class="formula-sistema formula-sistema-destacada mb-4">
+                \[
+                    J(X_n)\Delta X_n=F(X_n),
+                    \qquad
+                    X_{n+1}=X_n-\Delta X_n
+                \]
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label
+                        for="cantidad-matriz"
+                        class="form-label"
+                    >
+                        Número de variables
+                    </label>
+
+                    <input
+                        id="cantidad-matriz"
+                        type="number"
+                        class="form-control"
+                        min="2"
+                        max="8"
+                        value="2"
+                    >
+                </div>
+
+                <div class="col-md-8">
+                    <label
+                        for="variables-matriz"
+                        class="form-label"
+                    >
+                        Variables
+                    </label>
+
+                    <input
+                        id="variables-matriz"
+                        type="text"
+                        class="form-control"
+                        value="x, y"
+                        placeholder="Ejemplo: x, y, z"
+                    >
+                </div>
+            </div>
+
+            <div class="row g-4 mt-1">
+                <div class="col-xl-7">
+                    <h3 class="h5">
+                        Matriz Jacobiana \(J(X_n)\)
+                    </h3>
+
+                    <div
+                        id="matriz-jacobiana-calculadora"
+                        class="contenedor-matriz-calculadora"
+                    ></div>
+                </div>
+
+                <div class="col-xl-5">
+                    <div class="mb-4">
+                        <h3 class="h5">
+                            Vector \(F(X_n)\)
+                        </h3>
+
+                        <div
+                            id="vector-f-calculadora"
+                            class="contenedor-vector-calculadora"
+                        ></div>
+                    </div>
+
+                    <div>
+                        <h3 class="h5">
+                            Vector actual \(X_n\)
+                        </h3>
+
+                        <div
+                            id="vector-x-calculadora"
+                            class="contenedor-vector-calculadora"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+
+            <button
+                id="resolver-correccion-newton"
+                type="button"
+                class="btn boton-principal w-100 mt-4"
+            >
+                Calcular corrección y nueva aproximación
+            </button>
+
+            <div
+                id="mensaje-calculadora-matriz"
+                class="mt-3"
+                aria-live="polite"
+            ></div>
+
+            <section
+                id="resultado-calculadora-matriz"
+                class="resultado-calculadora-matriz d-none mt-4"
+            >
+                <h3 class="h5 mb-3">
+                    Resultado de la iteración
+                </h3>
+
+                <div class="row g-3">
+                    <div class="col-lg-6">
+                        <article class="resultado-vector-calculadora">
+                            <span>Corrección</span>
+
+                            <div
+                                id="resultado-delta-calculadora"
+                                class="formula-paso mb-0"
+                            ></div>
+                        </article>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <article class="resultado-vector-calculadora">
+                            <span>Nueva aproximación</span>
+
+                            <div
+                                id="resultado-x-siguiente-calculadora"
+                                class="formula-paso mb-0"
+                            ></div>
+                        </article>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <div class="metrica-sistema">
+                            <span>
+                                Norma infinita de \(\Delta X\)
+                            </span>
+
+                            <strong id="norma-delta-calculadora">
+                                —
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="metrica-sistema">
+                            <span>
+                                Residuo lineal
+                                \(\lVert J\Delta X-F\rVert_\infty\)
+                            </span>
+
+                            <strong id="residuo-lineal-calculadora">
+                                —
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive mt-4">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>Valor actual</th>
+                                <th>Corrección</th>
+                                <th>Valor siguiente</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="tabla-resultado-matriz"></tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/mathjs@15.2.0/lib/browser/math.js">
+    </script>
+
+    <script
+        src="{{ url_for('static', filename='js/calculadora.js') }}">
+    </script>
+
+    <script
+        src="{{ url_for(
+            'static',
+            filename='js/calculadora_sistemas.js'
+        ) }}">
+    </script>
+
+    <script
+        src="{{ url_for('static', filename='js/fondo-neon.js') }}">
+    </script>
+</body>
+</html>

@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Aprende | RaphSolve</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/estilos.css') }}"
+    >
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]]
+            }
+        };
+    </script>
+
+    <script
+        defer
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a
+                class="navbar-brand fw-bold"
+                href="{{ url_for('inicio') }}"
+            >
+                RaphSolve
+            </a>
+
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menuPrincipal"
+                aria-controls="menuPrincipal"
+                aria-expanded="false"
+                aria-label="Mostrar navegación"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div
+                id="menuPrincipal"
+                class="collapse navbar-collapse"
+            >
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('inicio') }}"
+                        >
+                            Resolver
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link active"
+                            href="{{ url_for('aprende') }}"
+                        >
+                            Aprende
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('ejercicios') }}"
+                        >
+                            Ejercicios
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('practica') }}"
+                        >
+                            Práctica
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('historial') }}"
+                        >
+                            Historial
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{{ url_for('calculadora') }}"
+                        >
+                            Calculadora
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        <section class="text-center mb-5">
+            <h1 class="titulo-principal">
+                Aprende Newton-Raphson
+            </h1>
+
+            <p class="subtitulo">
+                Comprende el método para una variable y para
+                sistemas no lineales de varias variables.
+            </p>
+        </section>
+
+        <section class="tarjeta-principal mb-4 seccion-aprende">
+            <h2 class="h4">
+                ¿Qué es Newton-Raphson?
+            </h2>
+
+            <p>
+                Newton-Raphson es un método numérico iterativo que
+                permite encontrar soluciones aproximadas de ecuaciones
+                no lineales.
+            </p>
+
+            <p>
+                En una variable se busca un valor de \(x\) que cumpla:
+            </p>
+
+            <div class="formula-paso">
+                \[
+                    f(x)=0
+                \]
+            </div>
+
+            <p class="mb-0">
+                En varias variables se busca un vector \(X\) que
+                convierta en cero todas las ecuaciones del sistema:
+            </p>
+
+            <div class="formula-paso">
+                \[
+                    F(X)
+                    =
+                    \begin{bmatrix}
+                        f_1(X) \\
+                        f_2(X) \\
+                        \vdots \\
+                        f_n(X)
+                    \end{bmatrix}
+                    =
+                    \begin{bmatrix}
+                        0 \\
+                        0 \\
+                        \vdots \\
+                        0
+                    \end{bmatrix}
+                \]
+            </div>
+        </section>
+
+        <section class="tarjeta-principal mb-4 seccion-aprende">
+            <div
+                class="d-flex flex-column flex-lg-row
+                       justify-content-between align-items-lg-center
+                       gap-3 mb-3"
+            >
+                <div>
+                    <h2 class="h4 mb-1">
+                        Newton-Raphson de una variable
+                    </h2>
+
+                    <p class="text-secondary mb-0">
+                        Se utiliza para resolver una ecuación \(f(x)=0\).
+                    </p>
+                </div>
+
+                <span class="insignia-modo">
+                    1D
+                </span>
+            </div>
+
+            <p>
+                A partir de una aproximación inicial \(x_0\), el método
+                construye nuevas aproximaciones mediante:
+            </p>
+
+            <div class="formula-paso">
+                \[
+                    x_{n+1}
+                    =
+                    x_n
+                    -
+                    \frac{f(x_n)}{f'(x_n)}
+                \]
+            </div>
+
+            <div class="row g-3 mt-1">
+                <div class="col-md-6 col-xl-3">
+                    <article class="tarjeta-paso">
+                        <span class="numero-paso">1</span>
+
+                        <h3 class="h5">
+                            Elegir \(x_0\)
+                        </h3>
+
+                        <p class="mb-0">
+                            Se selecciona una aproximación inicial
+                            cercana a la raíz esperada.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="col-md-6 col-xl-3">
+                    <article class="tarjeta-paso">
+                        <span class="numero-paso">2</span>
+
+                        <h3 class="h5">
+                            Evaluar
+                        </h3>
+
+                        <p class="mb-0">
+                            Se calculan \(f(x_n)\) y \(f'(x_n)\).
+                        </p>
+                    </article>
+                </div>
+
+                <div class="col-md-6 col-xl-3">
+                    <article class="tarjeta-paso">
+                        <span class="numero-paso">3</span>
+
+                        <h3 class="h5">
+                            Actualizar
+                        </h3>
+
+                        <p class="mb-0">
+                            Se obtiene \(x_{n+1}\) aplicando la fórmula.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="col-md-6 col-xl-3">
+                    <article class="tarjeta-paso">
+                        <span class="numero-paso">4</span>
+
+                        <h3 class="h5">
+                            Comprobar
+                        </h3>
+
+                        <p class="mb-0">
+                            Se repite hasta que el error sea menor
+                            que la tolerancia.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="tarjeta-principal mb-4 seccion-aprende">
+            <div
+                class="d-flex flex-column flex-lg-row
+                       justify-content-between align-items-lg-center
+                       gap-3 mb-3"
+            >
+                <div>
+                    <h2 class="h4 mb-1">
+                        Newton-Raphson para sistemas
+                    </h2>
+
+                    <p class="text-secondary mb-0">
+                        Se utiliza cuando hay dos o más ecuaciones
+                        y el mismo número de variables.
+                    </p>
+                </div>
+
+                <span class="insignia-modo insignia-modo-sistema">
+                    ND
+                </span>
+            </div>
+
+            <p>
+                Para un sistema de \(n\) variables se trabaja con un
+                vector de aproximaciones:
+            </p>
+
+            <div class="formula-paso">
+                \[
+                    X_n
+                    =
+                    \begin{bmatrix}
+                        x_{1,n} \\
+                        x_{2,n} \\
+                        \vdots \\
+                        x_{n,n}
+                    \end{bmatrix}
+                \]
+            </div>
+
+            <p>
+                Las derivadas parciales se organizan en la matriz
+                Jacobiana:
+            </p>
+
+            <div class="formula-paso">
+                \[
+                    J(X)
+                    =
+                    \begin{bmatrix}
+                        \frac{\partial f_1}{\partial x_1}
+                        &
+                        \frac{\partial f_1}{\partial x_2}
+                        &
+                        \cdots
+                        &
+                        \frac{\partial f_1}{\partial x_n}
+                        \\
+
+                        \frac{\partial f_2}{\partial x_1}
+                        &
+                        \frac{\partial f_2}{\partial x_2}
+                        &
+                        \cdots
+                        &
+                        \frac{\partial f_2}{\partial x_n}
+                        \\
+
+                        \vdots
+                        &
+                        \vdots
+                        &
+                        \ddots
+                        &
+                        \vdots
+                        \\
+
+                        \frac{\partial f_n}{\partial x_1}
+                        &
+                        \frac{\partial f_n}{\partial x_2}
+                        &
+                        \cdots
+                        &
+                        \frac{\partial f_n}{\partial x_n}
+                    \end{bmatrix}
+                \]
+            </div>
+
+            <p>
+                En cada iteración se resuelve el sistema lineal:
+            </p>
+
+            <div class="formula-paso">
+                \[
+                    J(X_n)\Delta X_n=F(X_n)
+                \]
+            </div>
+
+            <p>
+                Después se actualiza el vector:
+            </p>
+
+            <div class="formula-paso">
+                \[
+                    X_{n+1}=X_n-\Delta X_n
+                \]
+            </div>
+
+            <div class="alert alert-info mb-0">
+                RaphSolve resuelve el sistema lineal directamente.
+                No calcula la inversa de la Jacobiana, lo cual mejora
+                la estabilidad numérica.
+            </div>
+        </section>
+
+        <section class="tarjeta-principal mb-4 seccion-aprende">
+            <h2 class="h4">
+                Procedimiento para sistemas
+            </h2>
+
+            <div class="row g-3 mt-1">
+                <div class="col-md-6 col-xl-4">
+                    <article class="tarjeta-paso">
+                        <span class="numero-paso">1</span>
+
+                        <h3 class="h5">
+                            Definir el sistema
+                        </h3>
+
+                        <p class="mb-0">
+                            Se ingresa una ecuación por cada variable.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <article class="tarjeta-paso">
+                        <span class="numero-paso">2</span>
+
+                        <h3 class="h5">
+                            Elegir \(X_0\)
+                        </h3>
+
+                        <p class="mb-0">
+                            Se proporciona un valor inicial para cada
+                            variable.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <article class="tarjeta-paso">
+                        <span class="numero-paso">3</span>
+
+                        <h3 class="h5">
+                            Evaluar \(F(X_n)\)
+                        </h3>
+
+                        <p class="mb-0">
+                            Se calcula el valor de cada ecuación en
+                            la aproximación actual.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <article class="tarjeta-paso">
+                        <span class="numero-paso">4</span>
+
+                        <h3 class="h5">
+                            Evaluar \(J(X_n)\)
+                        </h3>
+
+                        <p class="mb-0">
+                            Se calculan todas las derivadas parciales.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <article class="tarjeta-paso">
+                        <span class="numero-paso">5</span>
+
+                        <h3 class="h5">
+                            Obtener \(\Delta X_n\)
+                        </h3>
+
+                        <p class="mb-0">
+                            Se resuelve el sistema lineal definido por
+                            la Jacobiana.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <article class="tarjeta-paso">
+                        <span class="numero-paso">6</span>
+
+                        <h3 class="h5">
+                            Comprobar convergencia
+                        </h3>
+
+                        <p class="mb-0">
+                            Se revisan el error aproximado y la norma
+                            del residuo.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="tarjeta-principal mb-4 seccion-aprende">
+            <h2 class="h4">
+                Ejemplo de dos variables
+            </h2>
+
+            <p>
+                Consideremos el sistema:
+            </p>
+
+            <div class="formula-paso">
+                \[
+                    \begin{cases}
+                        x^2+y^2-4=0 \\
+                        x-y=0
+                    \end{cases}
+                \]
+            </div>
+
+            <p>
+                Como \(x=y\), la solución positiva se encuentra cerca de:
+            </p>
+
+            <div class="resultado-final-paso">
+                \[
+                    x\approx1.41421356,
+                    \qquad
+                    y\approx1.41421356
+                \]
+            </div>
+
+            <p class="text-secondary mt-3 mb-0">
+                En este caso se pueden representar las dos superficies
+                en una gráfica 3D y observar la trayectoria de las
+                aproximaciones.
+            </p>
+        </section>
+
+        <section class="tarjeta-principal mb-4 seccion-aprende">
+            <h2 class="h4">
+                Ejemplo de tres variables
+            </h2>
+
+            <div class="formula-paso">
+                \[
+                    \begin{cases}
+                        x^2+y+z-3=0 \\
+                        x+y^2+z-3=0 \\
+                        x+y+z^2-3=0
+                    \end{cases}
+                \]
+            </div>
+
+            <p>
+                Una solución del sistema es:
+            </p>
+
+            <div class="resultado-final-paso">
+                \[
+                    x=1,
+                    \qquad
+                    y=1,
+                    \qquad
+                    z=1
+                \]
+            </div>
+
+            <p class="text-secondary mt-3 mb-0">
+                Para tres variables, RaphSolve representa la trayectoria
+                de las aproximaciones en el espacio.
+            </p>
+        </section>
+
+        <section class="tarjeta-principal mb-4 seccion-aprende">
+            <h2 class="h4">
+                Error y residuo
+            </h2>
+
+            <p>
+                En sistemas de varias variables se utilizan dos
+                indicadores para decidir si el método convergió.
+            </p>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <article class="tarjeta-paso">
+                        <h3 class="h5">
+                            Error aproximado
+                        </h3>
+
+                        <div class="formula-paso">
+                            \[
+                                \lVert
+                                    X_{n+1}-X_n
+                                \rVert_{\infty}
+                            \]
+                        </div>
+
+                        <p class="mb-0">
+                            Mide cuánto cambió la nueva aproximación.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="col-md-6">
+                    <article class="tarjeta-paso">
+                        <h3 class="h5">
+                            Norma del residuo
+                        </h3>
+
+                        <div class="formula-paso">
+                            \[
+                                \lVert
+                                    F(X_{n+1})
+                                \rVert_{\infty}
+                            \]
+                        </div>
+
+                        <p class="mb-0">
+                            Mide qué tan cerca están las ecuaciones
+                            del vector cero.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="tarjeta-principal mb-4 seccion-aprende">
+            <h2 class="h4">
+                Ventajas
+            </h2>
+
+            <ul class="mb-0">
+                <li>
+                    Puede converger muy rápidamente cerca de una solución.
+                </li>
+
+                <li>
+                    Funciona con una variable y con sistemas no lineales.
+                </li>
+
+                <li>
+                    Permite obtener resultados con alta precisión.
+                </li>
+
+                <li>
+                    La Jacobiana se puede calcular automáticamente.
+                </li>
+            </ul>
+        </section>
+
+        <section class="tarjeta-principal mb-4 seccion-aprende">
+            <h2 class="h4">
+                Limitaciones
+            </h2>
+
+            <ul class="mb-0">
+                <li>
+                    El resultado depende de los valores iniciales.
+                </li>
+
+                <li>
+                    Puede fallar cuando la derivada o la Jacobiana
+                    son cero o singulares.
+                </li>
+
+                <li>
+                    No garantiza convergencia para todos los problemas.
+                </li>
+
+                <li>
+                    Para sistemas grandes, la interpretación gráfica
+                    se limita a proyecciones de tres variables.
+                </li>
+            </ul>
+        </section>
+
+        <section class="tarjeta-principal mb-4 seccion-aprende">
+            <h2 class="h4">
+                Recomendaciones
+            </h2>
+
+            <div class="row g-3 mt-1">
+                <div class="col-md-4">
+                    <article class="tarjeta-paso">
+                        <h3 class="h5">
+                            Valores iniciales
+                        </h3>
+
+                        <p class="mb-0">
+                            Utiliza aproximaciones razonablemente cercanas
+                            a la solución esperada.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="col-md-4">
+                    <article class="tarjeta-paso">
+                        <h3 class="h5">
+                            Tolerancia
+                        </h3>
+
+                        <p class="mb-0">
+                            Una tolerancia pequeña mejora la precisión,
+                            pero puede requerir más iteraciones.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="col-md-4">
+                    <article class="tarjeta-paso">
+                        <h3 class="h5">
+                            Validación
+                        </h3>
+
+                        <p class="mb-0">
+                            Comprueba que la solución haga que las
+                            funciones sean cercanas a cero.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="tarjeta-resultado text-center">
+            <h2 class="h4">
+                ¿Listo para probar el método?
+            </h2>
+
+            <p>
+                Resuelve una función o un sistema y observa todas
+                las iteraciones, fórmulas y gráficas.
+            </p>
+
+            <a
+                href="{{ url_for('inicio') }}"
+                class="btn boton-principal px-5"
+            >
+                Ir al solucionador
+            </a>
+        </section>
+    </main>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <script
+        src="{{ url_for('static', filename='js/fondo-neon.js') }}">
+    </script>
+</body>
+</html>
