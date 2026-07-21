@@ -5,7 +5,7 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     >
 
     <title>RaphSolve</title>
@@ -311,6 +311,621 @@
                 margin-bottom: 8px;
             }
         }
+
+
+        /* =====================================================
+           Ajustes móviles para gráficas y reproductores
+           ===================================================== */
+
+        :root {
+            --altura-visible-movil: 100dvh;
+        }
+
+        #grafica-newton-3d,
+        #grafica-sistema-3d {
+            touch-action: none;
+            overscroll-behavior: contain;
+        }
+
+        @media (max-width: 767.98px) {
+            main.container {
+                width: 100%;
+                max-width: 100%;
+                padding-right: 10px;
+                padding-left: 10px;
+            }
+
+            .tarjeta-principal,
+            .tarjeta-resultado {
+                padding-right: 14px;
+                padding-left: 14px;
+                border-radius: 16px;
+            }
+
+            .controles-grafica-neon {
+                display: grid;
+                width: 100%;
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+                gap: 8px;
+            }
+
+            .controles-grafica-neon .btn {
+                width: 100%;
+                min-width: 0;
+                min-height: 42px;
+                padding: 8px 7px;
+                font-size: 0.82rem;
+                white-space: normal;
+            }
+
+            .leyenda-grafica-3d {
+                display: flex;
+                gap: 7px 10px;
+                flex-wrap: wrap;
+                align-items: center;
+                font-size: 0.78rem;
+            }
+
+            #grafica-newton-2d,
+            #grafica-newton-3d,
+            #grafica-sistema-3d,
+            #grafica-error-sistema {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                margin-right: 0 !important;
+                margin-left: 0 !important;
+            }
+
+            #grafica-newton-2d {
+                height: min(
+                    62dvh,
+                    500px
+                ) !important;
+                min-height: 390px !important;
+            }
+
+            #grafica-newton-3d,
+            #grafica-sistema-3d {
+                height: min(
+                    68dvh,
+                    560px
+                ) !important;
+                min-height: 430px !important;
+            }
+
+            #grafica-error-sistema {
+                height: 350px !important;
+                min-height: 320px !important;
+            }
+
+            #grafica-newton-2d
+            .plot-container,
+            #grafica-newton-2d
+            .svg-container,
+            #grafica-newton-3d
+            .plot-container,
+            #grafica-newton-3d
+            .svg-container,
+            #grafica-sistema-3d
+            .plot-container,
+            #grafica-sistema-3d
+            .svg-container,
+            #grafica-error-sistema
+            .plot-container,
+            #grafica-error-sistema
+            .svg-container {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            /*
+             * En celular la barra pequeña de Plotly ocupa demasiado.
+             * Los gestos y los botones grandes siguen disponibles.
+             */
+            #grafica-newton-3d
+            .modebar-container,
+            #grafica-sistema-3d
+            .modebar-container {
+                display: none !important;
+            }
+
+            .visor-reproductor-pasos {
+                height: min(
+                    55dvh,
+                    510px
+                );
+                min-height: 340px;
+                padding: 12px;
+            }
+
+            /*
+             * Pantalla completa del procedimiento:
+             * utiliza la altura visible real, no el 100vh clásico.
+             */
+            html body
+            .reproductor-pasos:fullscreen,
+            html body
+            .reproductor-pasos:-webkit-full-screen,
+            html body
+            .reproductor-pasos.modo-pantalla-completa {
+                width: 100vw !important;
+                height:
+                    var(
+                        --altura-visible-movil,
+                        100dvh
+                    ) !important;
+                min-height: 0 !important;
+                padding:
+                    max(
+                        7px,
+                        env(safe-area-inset-top)
+                    )
+                    max(
+                        7px,
+                        env(safe-area-inset-right)
+                    )
+                    max(
+                        7px,
+                        env(safe-area-inset-bottom)
+                    )
+                    max(
+                        7px,
+                        env(safe-area-inset-left)
+                    ) !important;
+                grid-template-rows:
+                    auto
+                    auto
+                    minmax(0, 1fr)
+                    auto !important;
+                gap: 6px;
+                overflow: hidden !important;
+            }
+
+            html body
+            .reproductor-pasos:fullscreen
+            .cabecera-reproductor-pasos,
+            html body
+            .reproductor-pasos:-webkit-full-screen
+            .cabecera-reproductor-pasos,
+            html body
+            .reproductor-pasos.modo-pantalla-completa
+            .cabecera-reproductor-pasos {
+                display: grid !important;
+                grid-template-columns:
+                    minmax(0, 1fr)
+                    auto;
+                align-items: center;
+                gap: 7px;
+                margin-bottom: 0 !important;
+            }
+
+            html body
+            .reproductor-pasos:fullscreen
+            .cabecera-reproductor-pasos h2,
+            html body
+            .reproductor-pasos:-webkit-full-screen
+            .cabecera-reproductor-pasos h2,
+            html body
+            .reproductor-pasos.modo-pantalla-completa
+            .cabecera-reproductor-pasos h2 {
+                margin: 0 !important;
+                font-size: 1rem;
+                line-height: 1.2;
+            }
+
+            html body
+            .reproductor-pasos:fullscreen
+            .cabecera-reproductor-pasos p,
+            html body
+            .reproductor-pasos:-webkit-full-screen
+            .cabecera-reproductor-pasos p,
+            html body
+            .reproductor-pasos.modo-pantalla-completa
+            .cabecera-reproductor-pasos p {
+                display: none !important;
+            }
+
+            html body
+            .reproductor-pasos:fullscreen
+            .acciones-reproductor-pasos,
+            html body
+            .reproductor-pasos:-webkit-full-screen
+            .acciones-reproductor-pasos,
+            html body
+            .reproductor-pasos.modo-pantalla-completa
+            .acciones-reproductor-pasos {
+                width: auto !important;
+                flex-wrap: nowrap;
+                justify-content: flex-end;
+                gap: 6px;
+            }
+
+            html body
+            .reproductor-pasos:fullscreen
+            .contador-pasos,
+            html body
+            .reproductor-pasos:-webkit-full-screen
+            .contador-pasos,
+            html body
+            .reproductor-pasos.modo-pantalla-completa
+            .contador-pasos {
+                padding: 6px 8px;
+                font-size: 0.72rem;
+                white-space: nowrap;
+            }
+
+            html body
+            .reproductor-pasos:fullscreen
+            .boton-pantalla-completa,
+            html body
+            .reproductor-pasos:-webkit-full-screen
+            .boton-pantalla-completa,
+            html body
+            .reproductor-pasos.modo-pantalla-completa
+            .boton-pantalla-completa {
+                width: 40px;
+                min-width: 40px;
+                min-height: 38px;
+                padding: 5px;
+                flex: 0 0 40px;
+            }
+
+            html body
+            .reproductor-pasos:fullscreen
+            .texto-pantalla-completa,
+            html body
+            .reproductor-pasos:-webkit-full-screen
+            .texto-pantalla-completa,
+            html body
+            .reproductor-pasos.modo-pantalla-completa
+            .texto-pantalla-completa {
+                display: none;
+            }
+
+            html body
+            .reproductor-pasos:fullscreen
+            .progress,
+            html body
+            .reproductor-pasos:-webkit-full-screen
+            .progress,
+            html body
+            .reproductor-pasos.modo-pantalla-completa
+            .progress {
+                height: 6px;
+                margin: 0 !important;
+            }
+
+            html body
+            .reproductor-pasos:fullscreen
+            .visor-reproductor-pasos,
+            html body
+            .reproductor-pasos:-webkit-full-screen
+            .visor-reproductor-pasos,
+            html body
+            .reproductor-pasos.modo-pantalla-completa
+            .visor-reproductor-pasos {
+                width: 100% !important;
+                height: 100% !important;
+                min-height: 0 !important;
+                max-height: none !important;
+                padding: 10px;
+                border-radius: 10px;
+                overflow: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            html body
+            .reproductor-pasos:fullscreen
+            .contenido-paso,
+            html body
+            .reproductor-pasos:-webkit-full-screen
+            .contenido-paso,
+            html body
+            .reproductor-pasos.modo-pantalla-completa
+            .contenido-paso {
+                min-width: 0;
+                max-width: 100%;
+                font-size: 0.9rem;
+                overflow-wrap: anywhere;
+            }
+
+            html body
+            .reproductor-pasos:fullscreen
+            .formula-paso,
+            html body
+            .reproductor-pasos:-webkit-full-screen
+            .formula-paso,
+            html body
+            .reproductor-pasos.modo-pantalla-completa
+            .formula-paso {
+                max-width: 100%;
+                padding: 9px;
+                overflow-x: auto;
+                font-size: 0.88rem;
+            }
+
+            html body
+            .reproductor-pasos:fullscreen
+            .controles-reproductor-pasos,
+            html body
+            .reproductor-pasos:-webkit-full-screen
+            .controles-reproductor-pasos,
+            html body
+            .reproductor-pasos.modo-pantalla-completa
+            .controles-reproductor-pasos {
+                display: grid !important;
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+                gap: 6px;
+                padding: 0 !important;
+                background: transparent !important;
+            }
+
+            html body
+            .reproductor-pasos:fullscreen
+            .controles-reproductor-pasos
+            .btn,
+            html body
+            .reproductor-pasos:-webkit-full-screen
+            .controles-reproductor-pasos
+            .btn,
+            html body
+            .reproductor-pasos.modo-pantalla-completa
+            .controles-reproductor-pasos
+            .btn {
+                width: 100%;
+                min-height: 39px;
+                padding: 6px 5px;
+                flex: none !important;
+                order: 0 !important;
+                font-size: 0.76rem;
+                white-space: nowrap;
+            }
+
+            /*
+             * Pantalla completa de las dos gráficas 3D.
+             * Estas reglas tienen prioridad sobre los estilos
+             * creados dinámicamente por grafica.js.
+             */
+            html body
+            .envoltura-grafica-newton-3d:fullscreen,
+            html body
+            .envoltura-grafica-newton-3d:-webkit-full-screen,
+            html body
+            .envoltura-grafica-newton-3d.pantalla-completa-simulada,
+            html body
+            .envoltura-grafica-sistema-3d:fullscreen,
+            html body
+            .envoltura-grafica-sistema-3d:-webkit-full-screen,
+            html body
+            .envoltura-grafica-sistema-3d.pantalla-completa-simulada {
+                display: grid !important;
+                width: 100vw !important;
+                height:
+                    var(
+                        --altura-visible-movil,
+                        100dvh
+                    ) !important;
+                min-height: 0 !important;
+                padding:
+                    max(
+                        5px,
+                        env(safe-area-inset-top)
+                    )
+                    max(
+                        5px,
+                        env(safe-area-inset-right)
+                    )
+                    max(
+                        5px,
+                        env(safe-area-inset-bottom)
+                    )
+                    max(
+                        5px,
+                        env(safe-area-inset-left)
+                    ) !important;
+                gap: 5px !important;
+                grid-template-rows:
+                    auto
+                    minmax(0, 1fr) !important;
+                overflow: hidden !important;
+                background: #05030a !important;
+            }
+
+            html body
+            .envoltura-grafica-newton-3d:fullscreen
+            .barra-grafica-newton-completa,
+            html body
+            .envoltura-grafica-newton-3d:-webkit-full-screen
+            .barra-grafica-newton-completa,
+            html body
+            .envoltura-grafica-newton-3d.pantalla-completa-simulada
+            .barra-grafica-newton-completa,
+            html body
+            .envoltura-grafica-sistema-3d:fullscreen
+            .barra-grafica-sistema-completa,
+            html body
+            .envoltura-grafica-sistema-3d:-webkit-full-screen
+            .barra-grafica-sistema-completa,
+            html body
+            .envoltura-grafica-sistema-3d.pantalla-completa-simulada
+            .barra-grafica-sistema-completa {
+                display: flex !important;
+                width: 100%;
+                min-width: 0;
+                min-height: 44px;
+                padding: 5px !important;
+                gap: 5px !important;
+                flex-wrap: nowrap !important;
+                justify-content: flex-start !important;
+                overflow-x: auto !important;
+                overflow-y: hidden;
+                scrollbar-width: thin;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            html body
+            .barra-grafica-newton-completa
+            .boton-control-newton-completo,
+            html body
+            .barra-grafica-sistema-completa
+            .boton-control-grafica-completa {
+                min-width: max-content;
+                min-height: 36px !important;
+                padding: 6px 10px !important;
+                font-size: 0.72rem !important;
+                flex: 0 0 auto;
+            }
+
+            html body
+            .envoltura-grafica-newton-3d:fullscreen
+            #grafica-newton-3d,
+            html body
+            .envoltura-grafica-newton-3d:-webkit-full-screen
+            #grafica-newton-3d,
+            html body
+            .envoltura-grafica-newton-3d.pantalla-completa-simulada
+            #grafica-newton-3d,
+            html body
+            .envoltura-grafica-sistema-3d:fullscreen
+            #grafica-sistema-3d,
+            html body
+            .envoltura-grafica-sistema-3d:-webkit-full-screen
+            #grafica-sistema-3d,
+            html body
+            .envoltura-grafica-sistema-3d.pantalla-completa-simulada
+            #grafica-sistema-3d {
+                width: 100% !important;
+                height: 100% !important;
+                min-width: 0 !important;
+                min-height: 0 !important;
+                max-height: none !important;
+                margin: 0 !important;
+                border-radius: 9px;
+            }
+
+            html body
+            .envoltura-grafica-newton-3d:fullscreen
+            #grafica-newton-3d
+            .plot-container,
+            html body
+            .envoltura-grafica-newton-3d:fullscreen
+            #grafica-newton-3d
+            .svg-container,
+            html body
+            .envoltura-grafica-newton-3d.pantalla-completa-simulada
+            #grafica-newton-3d
+            .plot-container,
+            html body
+            .envoltura-grafica-newton-3d.pantalla-completa-simulada
+            #grafica-newton-3d
+            .svg-container,
+            html body
+            .envoltura-grafica-sistema-3d:fullscreen
+            #grafica-sistema-3d
+            .plot-container,
+            html body
+            .envoltura-grafica-sistema-3d:fullscreen
+            #grafica-sistema-3d
+            .svg-container,
+            html body
+            .envoltura-grafica-sistema-3d.pantalla-completa-simulada
+            #grafica-sistema-3d
+            .plot-container,
+            html body
+            .envoltura-grafica-sistema-3d.pantalla-completa-simulada
+            #grafica-sistema-3d
+            .svg-container {
+                width: 100% !important;
+                height: 100% !important;
+                min-height: 0 !important;
+            }
+
+            html body
+            .envoltura-grafica-newton-3d:fullscreen
+            .modebar-container,
+            html body
+            .envoltura-grafica-newton-3d:-webkit-full-screen
+            .modebar-container,
+            html body
+            .envoltura-grafica-newton-3d.pantalla-completa-simulada
+            .modebar-container,
+            html body
+            .envoltura-grafica-sistema-3d:fullscreen
+            .modebar-container,
+            html body
+            .envoltura-grafica-sistema-3d:-webkit-full-screen
+            .modebar-container,
+            html body
+            .envoltura-grafica-sistema-3d.pantalla-completa-simulada
+            .modebar-container {
+                display: none !important;
+            }
+        }
+
+        @media (
+            max-width: 900px
+        ) and (
+            orientation: landscape
+        ) {
+            #grafica-newton-3d,
+            #grafica-sistema-3d {
+                height: 82dvh !important;
+                min-height: 300px !important;
+            }
+
+            html body
+            .reproductor-pasos:fullscreen,
+            html body
+            .reproductor-pasos:-webkit-full-screen,
+            html body
+            .reproductor-pasos.modo-pantalla-completa {
+                grid-template-rows:
+                    auto
+                    auto
+                    minmax(0, 1fr)
+                    auto !important;
+            }
+
+            html body
+            .reproductor-pasos:fullscreen
+            .controles-reproductor-pasos,
+            html body
+            .reproductor-pasos:-webkit-full-screen
+            .controles-reproductor-pasos,
+            html body
+            .reproductor-pasos.modo-pantalla-completa
+            .controles-reproductor-pasos {
+                grid-template-columns:
+                    repeat(4, minmax(0, 1fr));
+            }
+
+            html body
+            .reproductor-pasos:fullscreen
+            .controles-reproductor-pasos
+            .btn,
+            html body
+            .reproductor-pasos:-webkit-full-screen
+            .controles-reproductor-pasos
+            .btn,
+            html body
+            .reproductor-pasos.modo-pantalla-completa
+            .controles-reproductor-pasos
+            .btn {
+                min-height: 34px;
+                padding: 4px;
+                font-size: 0.7rem;
+            }
+        }
+
+        @supports not (height: 100dvh) {
+            :root {
+                --altura-visible-movil: 100vh;
+            }
+        }
+
     </style>
 
 </head>
@@ -2009,6 +2624,124 @@
                 );
             }
         );
+    </script>
+
+
+    <script>
+        /*
+         * Corrige la altura móvil cuando la barra del navegador
+         * aparece, desaparece o cambia la orientación.
+         */
+        (() => {
+            let temporizadorRedimension = null;
+
+            function actualizarAlturaVisible() {
+                const altura =
+                    window.visualViewport?.height
+                    || window.innerHeight;
+
+                document.documentElement.style.setProperty(
+                    "--altura-visible-movil",
+                    `${Math.round(altura)}px`
+                );
+            }
+
+            function redimensionarPlotly() {
+                if (
+                    typeof Plotly === "undefined"
+                    || !Plotly.Plots
+                ) {
+                    return;
+                }
+
+                [
+                    "grafica-newton-2d",
+                    "grafica-newton-3d",
+                    "grafica-sistema-3d",
+                    "grafica-error-sistema"
+                ].forEach(id => {
+                    const grafica =
+                        document.getElementById(id);
+
+                    if (
+                        grafica
+                        && grafica.offsetParent !== null
+                    ) {
+                        try {
+                            Plotly.Plots.resize(grafica);
+                        } catch (error) {
+                            console.debug(
+                                "La gráfica todavía no está lista.",
+                                error
+                            );
+                        }
+                    }
+                });
+            }
+
+            function programarAjuste() {
+                actualizarAlturaVisible();
+
+                window.clearTimeout(
+                    temporizadorRedimension
+                );
+
+                temporizadorRedimension =
+                    window.setTimeout(
+                        redimensionarPlotly,
+                        140
+                    );
+
+                window.setTimeout(
+                    redimensionarPlotly,
+                    420
+                );
+            }
+
+            actualizarAlturaVisible();
+
+            window.addEventListener(
+                "resize",
+                programarAjuste,
+                { passive: true }
+            );
+
+            window.addEventListener(
+                "orientationchange",
+                () => {
+                    window.setTimeout(
+                        programarAjuste,
+                        120
+                    );
+
+                    window.setTimeout(
+                        programarAjuste,
+                        520
+                    );
+                }
+            );
+
+            window.visualViewport?.addEventListener(
+                "resize",
+                programarAjuste,
+                { passive: true }
+            );
+
+            document.addEventListener(
+                "fullscreenchange",
+                programarAjuste
+            );
+
+            document.addEventListener(
+                "webkitfullscreenchange",
+                programarAjuste
+            );
+
+            document.addEventListener(
+                "DOMContentLoaded",
+                programarAjuste
+            );
+        })();
     </script>
 
 </body>
