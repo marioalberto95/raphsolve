@@ -966,14 +966,11 @@
                 rgba(255, 43, 214, 0.5);
         }
 
-        .reproductor-pasos:fullscreen
-        .boton-salir-flotante-reproductor,
-        .reproductor-pasos:-webkit-full-screen
-        .boton-salir-flotante-reproductor,
-        .reproductor-pasos.modo-pantalla-completa
-        .boton-salir-flotante-reproductor {
-            display: inline-flex;
-        }
+        /*
+         * En escritorio se conserva el botón normal del encabezado.
+         * El botón flotante se activa únicamente en pantallas
+         * móviles o dispositivos táctiles.
+         */
 
         body.reproductor-pantalla-completa {
             position: fixed;
@@ -983,7 +980,31 @@
             overscroll-behavior: none;
         }
 
-        @media (max-width: 767.98px) {
+        @media
+        (max-width: 950px),
+        (hover: none) and (pointer: coarse) {
+            .reproductor-pasos:fullscreen
+            .boton-salir-flotante-reproductor,
+            .reproductor-pasos:-webkit-full-screen
+            .boton-salir-flotante-reproductor,
+            .reproductor-pasos.modo-pantalla-completa
+            .boton-salir-flotante-reproductor {
+                display: inline-flex;
+            }
+
+            /*
+             * En celular usamos solamente el botón flotante,
+             * por lo que se oculta el botón normal del encabezado.
+             */
+            .reproductor-pasos:fullscreen
+            .boton-pantalla-completa,
+            .reproductor-pasos:-webkit-full-screen
+            .boton-pantalla-completa,
+            .reproductor-pasos.modo-pantalla-completa
+            .boton-pantalla-completa {
+                display: none !important;
+            }
+
             .boton-salir-flotante-reproductor {
                 top: max(
                     6px,

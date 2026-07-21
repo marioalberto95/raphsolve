@@ -1181,14 +1181,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     rgba(255, 43, 214, 0.5);
             }
 
-            .envoltura-grafica-sistema-3d:fullscreen
-            .boton-salir-flotante-sistema,
-            .envoltura-grafica-sistema-3d:-webkit-full-screen
-            .boton-salir-flotante-sistema,
-            .envoltura-grafica-sistema-3d.pantalla-completa-simulada
-            .boton-salir-flotante-sistema {
-                display: inline-flex;
-            }
+            /*
+             * En escritorio se usa el botón Salir de la barra.
+             * El botón flotante queda reservado para celular.
+             */
 
             .boton-salir-grafica-completa {
                 order: -1;
@@ -1322,7 +1318,30 @@ document.addEventListener("DOMContentLoaded", () => {
                 overflow: hidden;
             }
 
-            @media (max-width: 820px) {
+            @media
+            (max-width: 950px),
+            (hover: none) and (pointer: coarse) {
+                .envoltura-grafica-sistema-3d:fullscreen
+                .boton-salir-flotante-sistema,
+                .envoltura-grafica-sistema-3d:-webkit-full-screen
+                .boton-salir-flotante-sistema,
+                .envoltura-grafica-sistema-3d.pantalla-completa-simulada
+                .boton-salir-flotante-sistema {
+                    display: inline-flex;
+                }
+
+                /*
+                 * En celular se deja únicamente el botón flotante.
+                 */
+                .envoltura-grafica-sistema-3d:fullscreen
+                .boton-salir-grafica-completa,
+                .envoltura-grafica-sistema-3d:-webkit-full-screen
+                .boton-salir-grafica-completa,
+                .envoltura-grafica-sistema-3d.pantalla-completa-simulada
+                .boton-salir-grafica-completa {
+                    display: none !important;
+                }
+
                 .boton-salir-flotante-sistema {
                     top: max(
                         6px,

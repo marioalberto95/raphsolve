@@ -1016,14 +1016,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     rgba(255, 43, 214, 0.5);
             }
 
-            .envoltura-grafica-newton-3d:fullscreen
-            .boton-salir-flotante-newton,
-            .envoltura-grafica-newton-3d:-webkit-full-screen
-            .boton-salir-flotante-newton,
-            .envoltura-grafica-newton-3d.pantalla-completa-simulada
-            .boton-salir-flotante-newton {
-                display: inline-flex;
-            }
+            /*
+             * En escritorio se usa el botón Salir de la barra.
+             * El botón flotante queda reservado para celular.
+             */
 
             .boton-salir-newton-completo {
                 order: -1;
@@ -1147,7 +1143,30 @@ document.addEventListener("DOMContentLoaded", () => {
                 overflow: hidden;
             }
 
-            @media (max-width: 820px) {
+            @media
+            (max-width: 950px),
+            (hover: none) and (pointer: coarse) {
+                .envoltura-grafica-newton-3d:fullscreen
+                .boton-salir-flotante-newton,
+                .envoltura-grafica-newton-3d:-webkit-full-screen
+                .boton-salir-flotante-newton,
+                .envoltura-grafica-newton-3d.pantalla-completa-simulada
+                .boton-salir-flotante-newton {
+                    display: inline-flex;
+                }
+
+                /*
+                 * En celular se deja únicamente el botón flotante.
+                 */
+                .envoltura-grafica-newton-3d:fullscreen
+                .boton-salir-newton-completo,
+                .envoltura-grafica-newton-3d:-webkit-full-screen
+                .boton-salir-newton-completo,
+                .envoltura-grafica-newton-3d.pantalla-completa-simulada
+                .boton-salir-newton-completo {
+                    display: none !important;
+                }
+
                 .boton-salir-flotante-newton {
                     top: max(
                         6px,
