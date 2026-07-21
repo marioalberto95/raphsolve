@@ -1037,6 +1037,134 @@
             }
         }
 
+
+
+        /* =====================================================
+           Validación personalizada del campo Función
+           ===================================================== */
+
+        .mensaje-validacion-neon {
+            display: none;
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px 14px;
+            gap: 11px;
+            align-items: flex-start;
+            color: #ffd9f7;
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255, 43, 214, 0.13),
+                    rgba(255, 87, 87, 0.09)
+                );
+            border: 1px solid
+                rgba(255, 43, 214, 0.62);
+            border-left: 5px solid
+                #ff2bd6;
+            border-radius: 12px;
+            box-shadow:
+                0 0 14px
+                    rgba(255, 43, 214, 0.18),
+                inset 0 0 18px
+                    rgba(255, 43, 214, 0.04);
+        }
+
+        .mensaje-validacion-neon.visible {
+            display: flex;
+            animation:
+                aparecer-validacion-neon
+                240ms ease;
+        }
+
+        .icono-validacion-neon {
+            display: inline-grid;
+            width: 27px;
+            height: 27px;
+            flex: 0 0 27px;
+            color: #08030d;
+            font-size: 0.95rem;
+            font-weight: 950;
+            place-items: center;
+            background:
+                linear-gradient(
+                    135deg,
+                    #ff2bd6,
+                    #ff7a59
+                );
+            border-radius: 50%;
+            box-shadow:
+                0 0 12px
+                    rgba(255, 43, 214, 0.62);
+        }
+
+        .contenido-validacion-neon {
+            min-width: 0;
+        }
+
+        .titulo-validacion-neon {
+            display: block;
+            margin-bottom: 2px;
+            color: #ffffff;
+            font-weight: 900;
+        }
+
+        .texto-validacion-neon {
+            display: block;
+            color: #e9cfe8;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .form-control.campo-invalido-neon {
+            color: #ffffff;
+            border-color:
+                #ff2bd6 !important;
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255, 43, 214, 0.075),
+                    rgba(8, 4, 16, 0.96)
+                );
+            box-shadow:
+                0 0 0 2px
+                    rgba(255, 43, 214, 0.15),
+                0 0 18px
+                    rgba(255, 43, 214, 0.34) !important;
+        }
+
+        .form-control.campo-invalido-neon::placeholder {
+            color: rgba(
+                255,
+                214,
+                247,
+                0.68
+            );
+        }
+
+        @keyframes aparecer-validacion-neon {
+            from {
+                opacity: 0;
+                transform:
+                    translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform:
+                    translateY(0);
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .mensaje-validacion-neon {
+                padding: 10px 11px;
+            }
+
+            .texto-validacion-neon {
+                font-size: 0.84rem;
+            }
+        }
+
     </style>
 
 </head>
@@ -1256,7 +1384,35 @@
                                 'funcion',
                                 request.args.get('funcion', '')
                             ) }}"
+                            required
+                            aria-describedby="mensaje-validacion-funcion"
+                            aria-invalid="false"
                         >
+
+                        <div
+                            id="mensaje-validacion-funcion"
+                            class="mensaje-validacion-neon"
+                            role="alert"
+                            aria-live="polite"
+                        >
+                            <span
+                                class="icono-validacion-neon"
+                                aria-hidden="true"
+                            >
+                                !
+                            </span>
+
+                            <span class="contenido-validacion-neon">
+                                <strong class="titulo-validacion-neon">
+                                    Falta ingresar la función
+                                </strong>
+
+                                <span class="texto-validacion-neon">
+                                    Escribe una expresión, por ejemplo:
+                                    <strong>x^2 - 2</strong>.
+                                </span>
+                            </span>
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -2958,6 +3114,176 @@
                 programarAjuste
             );
         })();
+    </script>
+
+
+    <script>
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+                const formulario =
+                    document.getElementById(
+                        "formulario-newton"
+                    );
+
+                const campoFuncion =
+                    document.getElementById(
+                        "funcion"
+                    );
+
+                const mensajeFuncion =
+                    document.getElementById(
+                        "mensaje-validacion-funcion"
+                    );
+
+                const modoSistema =
+                    document.getElementById(
+                        "modo-sistema"
+                    );
+
+                const modoUnaVariable =
+                    document.getElementById(
+                        "modo-una-variable"
+                    );
+
+                if (
+                    !formulario
+                    || !campoFuncion
+                    || !mensajeFuncion
+                ) {
+                    return;
+                }
+
+                function esModoUnaVariable() {
+                    return !modoSistema?.checked;
+                }
+
+                function mostrarErrorFuncion() {
+                    campoFuncion.classList.add(
+                        "campo-invalido-neon"
+                    );
+
+                    campoFuncion.setAttribute(
+                        "aria-invalid",
+                        "true"
+                    );
+
+                    mensajeFuncion.classList.add(
+                        "visible"
+                    );
+
+                    mensajeFuncion.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+
+                    window.setTimeout(
+                        () => {
+                            campoFuncion.focus({
+                                preventScroll: true
+                            });
+                        },
+                        260
+                    );
+                }
+
+                function ocultarErrorFuncion() {
+                    campoFuncion.classList.remove(
+                        "campo-invalido-neon"
+                    );
+
+                    campoFuncion.setAttribute(
+                        "aria-invalid",
+                        "false"
+                    );
+
+                    mensajeFuncion.classList.remove(
+                        "visible"
+                    );
+                }
+
+                /*
+                 * Evita la burbuja gris/naranja del navegador
+                 * y muestra la alerta personalizada de RaphSolve.
+                 */
+                campoFuncion.addEventListener(
+                    "invalid",
+                    evento => {
+                        if (!esModoUnaVariable()) {
+                            return;
+                        }
+
+                        evento.preventDefault();
+                        mostrarErrorFuncion();
+                    }
+                );
+
+                formulario.addEventListener(
+                    "submit",
+                    evento => {
+                        if (
+                            esModoUnaVariable()
+                            && !campoFuncion.value.trim()
+                        ) {
+                            evento.preventDefault();
+                            mostrarErrorFuncion();
+                        }
+                    }
+                );
+
+                campoFuncion.addEventListener(
+                    "input",
+                    () => {
+                        if (
+                            campoFuncion.value.trim()
+                        ) {
+                            ocultarErrorFuncion();
+                        }
+                    }
+                );
+
+                campoFuncion.addEventListener(
+                    "blur",
+                    () => {
+                        if (
+                            esModoUnaVariable()
+                            && !campoFuncion.value.trim()
+                            && campoFuncion.classList.contains(
+                                "campo-invalido-neon"
+                            )
+                        ) {
+                            mostrarErrorFuncion();
+                        }
+                    }
+                );
+
+                modoSistema?.addEventListener(
+                    "change",
+                    () => {
+                        if (modoSistema.checked) {
+                            ocultarErrorFuncion();
+                            campoFuncion.required = false;
+                        }
+                    }
+                );
+
+                modoUnaVariable?.addEventListener(
+                    "change",
+                    () => {
+                        if (modoUnaVariable.checked) {
+                            campoFuncion.required = true;
+                        }
+                    }
+                );
+
+                /*
+                 * El campo solo es obligatorio cuando se resuelve
+                 * una función de una variable.
+                 */
+                campoFuncion.required =
+                    esModoUnaVariable();
+            }
+        );
     </script>
 
 </body>
